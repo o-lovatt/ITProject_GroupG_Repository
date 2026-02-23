@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/ITSD-DT2025-26-Template/ITSD Card Game 25-26.iml" filepath="$PROJECT_DIR$/.idea/modules/ITSD-DT2025-26-Template/ITSD Card Game 25-26.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/ITSD-DT2025-26-Template/ITSD Card Game 25-26.ITSD Card Game 25-26-build.iml" filepath="$PROJECT_DIR$/.idea/modules/ITSD-DT2025-26-Template/ITSD Card Game 25-26.ITSD Card Game 25-26-build.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/ITSD-DT2025-26-Template/ITSD Card Game 25-26.main.iml" filepath="$PROJECT_DIR$/.idea/modules/ITSD-DT2025-26-Template/ITSD Card Game 25-26.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/ITSD-DT2025-26-Template/ITSD Card Game 25-26.test.iml" filepath="$PROJECT_DIR$/.idea/modules/ITSD-DT2025-26-Template/ITSD Card Game 25-26.test.iml" />
+    </modules>
+  </component>
+</project>

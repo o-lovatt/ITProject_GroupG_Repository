@@ -1,0 +1,14 @@
+# SBT / Scala / Play
+target/
+project/target/
+project/project/
+.cache/
+logs/
+null/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
