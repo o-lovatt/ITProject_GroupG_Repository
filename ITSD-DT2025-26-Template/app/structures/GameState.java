@@ -51,7 +51,7 @@ public class GameState {
         }
 
         public Boolean isInBounds(Position pos){
-            return boan.isInBounds(pos); //true if pos is in 9x5 board
+            return board.isInBounds(pos); //true if pos is in 9x5 board
         }
 
         public List<Unit> getUnitsFor(PlayerSide side){
@@ -62,7 +62,7 @@ public class GameState {
             return board.getAllUnits();//return all units on the board
         }
 
-        public List<Position> getValidSummonTiles(PlayerSide) {
+        public List<Position> getValidSummonTiles(PlayerSide side) {
             return board.getValidSummonTiles(side);//return valid tile positions for summoning units
         }
 
@@ -75,43 +75,88 @@ public class GameState {
             } else {
                 return aiState;//return playerstate on its own side
             }
+        }
 
-        public PlayerState getActivePlayerState () {
+        public PlayerState getActivePlayerState() {
             return getPlayerState(activePlayer);//return current active player
         }
 
-        public PlayerState getInactivePlayerState () {
-//                return PLayerState(??);
-//            }
+        public PlayerState getInactivePlayerState() {
+                //return PLayerState(??);//// come back to here!!
 
-        }//// come back to here!!!
+        }
 
 
-        public PlayerState getHumanState () {
-            return humanState;
+        public PlayerState getHumanState() {
+            return humanState; //these two might not be needed but added just incase
         }
 
         public PlayerState getAiState(){
-            return aiState;
+            return aiState; // :P
+        }
+
+        public boolean isActivePlayer(PlayerSide side){
+            return activePlayer == side; //return if current side also current player?
         }
 
 
+
         //turn stuff
+        public PlayerSide getActivePlayer(){
+            return activePlayer;
+            }
+        public int getTurnNumber(){
+            return turnNumber;
+            }
+
+        public GamePhase getCurrentPhase(){
+            return currentPhase;
+            }
+
+        public void setGamePhase(GamePhase phase){
+            this.currentPhase = phase;
+        }//advance the game phase
+
+
+        //game over stuff
+        public boolean isGameOver(){
+            return gameOver;
+            }
+
+        public PlayerSide getWinner(){
+                return winner;
+            }
+
+        public void checkWinner(){
+                if (humanState.isDefeated()){
+                    setGameOver(PlayerSide.AI_RIGHT);
+                } else if (aiState.isDefeated()) {
+                    setGameOver(PlayerSide.HUMAN_LEFT);
+                }//checks if eitherplayer has been defeated
+            }//sets game over and the winner
+
+        public void advanceTurn(){
+            this.turnNumber++;
+                /// come back to here!
+            }//switches player and increments turn
+
+        public void setGameOver(PlayerSide winner){
+                this.gameOver = true;
+                System.out.println("Game over! Winner: " + winner);
+            }//set game to game over and prints winner
 
 
 
     //debugging return string
         @Override
-        public String toString(){
-            return "GameState: "
-                    + "Turn NUmber: " + turnNumber
-                    + "Active Player: " + activePlayer
-                    + "Game Phase: " + currentPhase
-                    + "Human HP: " + humanState.getHealth()
-                    + "Human Mana: " + humanState.getMana()
-                    + "AI HP: " + aiState.getHealth()
-                    + "AI Mana: " + aiState.getMana()
-                    + gameOver + winner;
+        public String toString() {
+                return "GameState: " + "Turn NUmber: " + turnNumber + "Active Player: " + activePlayer + "Game Phase: " + currentPhase
+                        + "Human HP: " + humanState.getHealth()
+                        + "Human Mana: " + humanState.getMana()
+                        + "AI HP: " + aiState.getHealth()
+                        + "AI Mana: " + aiState.getMana()
+                        + gameOver + winner;
+            }
         }
     }
 
