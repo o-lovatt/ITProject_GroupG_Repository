@@ -7,6 +7,7 @@ public class PlayerState {
 
     private final PlayerSide side;
     private final AvatarUnit avatar;
+    //private int health; ???
     private int mana;
     private final Deck deck;
     private final Hand hand;
@@ -14,6 +15,7 @@ public class PlayerState {
     public PlayerState(PlayerSide side, AvatarUnit avatar, Deck deck) {
         this.side = side;
         this.avatar = avatar;
+        //this.health = INITIAL_HEALTH;
         this.mana = INITIAL_MANA;
         this.deck = deck;
         this.hand = new Hand();

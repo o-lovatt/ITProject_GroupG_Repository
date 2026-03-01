@@ -2,7 +2,7 @@
 target/
 project/target/
 project/project/
-project/.idea/
+ITSD-DT2025-26-Template/.idea/
 .cache/
 logs/
 null/

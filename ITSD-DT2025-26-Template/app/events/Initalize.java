@@ -1,11 +1,9 @@
 package events;
 
-import com.fasterxml.jackson.databind.JsonNode;
-
-import akka.actor.ActorRef;
-import demo.CommandDemo;
-import demo.Loaders_2024_Check;
 import structures.GameState;
+import akka.actor.ActorRef;
+import com.fasterxml.jackson.databind.JsonNode;
+import demo.CommandDemo;
 
 /**
  * Indicates that both the core game loop in the browser is starting, meaning
@@ -31,6 +29,17 @@ public class Initalize implements EventProcessor{
 		// User 1 makes a change
 		CommandDemo.executeDemo(out); // this executes the command demo, comment out this when implementing your solution
 		//Loaders_2024_Check.test(out);
+
+
+        /* TODO...
+        create board -> e.g. Board board = new Board()
+        create decks (human and ai) -> Deck human/aiDeck = CardLoader.getPlayer1/2Cards()
+        create avatars -> AvatarUnit human/aiAvatar = new AvatarUnit(??....)
+        create playerstates -> PlayerState human/aiState = new PlayerState(PlayerSide.HUMAN_LEFT/AI_RIGHT,human/aiAvatar, human/aiDeck)
+        place avatars on correct tiles
+        draw first hand
+
+         */
 	}
 
 }
