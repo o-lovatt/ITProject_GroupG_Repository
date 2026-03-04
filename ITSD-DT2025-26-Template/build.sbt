@@ -23,6 +23,7 @@ lazy val root = (project in file("."))
     libraryDependencies += "com.fasterxml.jackson.dataformat" % "jackson-dataformat-yaml" % "2.10.3",
     libraryDependencies += "junit" % "junit" % "4.13.2",
     libraryDependencies += "com.novocode" % "junit-interface" % "0.11" % Test exclude("junit", "junit-dep"),
+    PlayKeys.fileWatchService := play.dev.filewatch.FileWatchService.jdk7(play.sbt.run.toLoggerProxy(sLog.value)),
     LessKeys.compress := true,
     javacOptions ++= Seq(
       "-Xlint:unchecked",
