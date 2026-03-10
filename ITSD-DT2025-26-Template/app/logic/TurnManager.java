@@ -9,18 +9,18 @@ import structures.basic.PlayerSide;
 public class TurnManager {
     private int currentTurn;
     private PlayerSide activePlayer;
-    private int player1Mana;
-    private int player2Mana;
+    private GameState gameState;
 
     /**
      * Initializes the TurnManager with the starting state.
      * The game starts with the human player (HUMAN_LEFT) on turn 1 with 1 mana.
      */
-    public TurnManager() {
+    public TurnManager(GameState gameState) {
+        this.gameState = gameState;
         this.currentTurn = 1;
         this.activePlayer = PlayerSide.HUMAN_LEFT;
-        this.player1Mana = 1;
-        this.player2Mana = 1;
+        this.gameState.getPlayer1State().setMana(1);
+        this.gameState.getPlayer2State().setMana(1);
     }
 
     /**
@@ -29,21 +29,17 @@ public class TurnManager {
      */
     public void addMana() {
         if (activePlayer == PlayerSide.HUMAN_LEFT) {
-            player1Mana = Math.min(currentTurn + 1, 9);
+            gameState.getPlayer1State().setMana(Math.min(currentTurn + 1, 9));
         } else {
-            player2Mana = Math.min(currentTurn + 1, 9);
+            gameState.getPlayer2State().setMana(Math.min(currentTurn + 1, 9));
         }
     }
 
     /**
      * Drains all mana from the currently active player.
      */
-    public void drainMana() {
-        if (activePlayer == PlayerSide.HUMAN_LEFT) {
-            player1Mana = 0;
-        } else {
-            player2Mana = 0;
-        }
+    public static void drainMana(GameState gameState) {
+        gameState.getActivePlayerState().resetMana();
     }
 
     /**
@@ -58,7 +54,7 @@ public class TurnManager {
      * This method will drain mana, switch player, increment turn, and add new mana.
      */
     public void endTurn() {
-        drainMana();
+        drainMana(gameState);
         switchActivePlayer();
         currentTurn++;
         addMana();
@@ -86,6 +82,8 @@ public class TurnManager {
      * @return The current mana value.
      */
     public int getPlayerMana(PlayerSide side) {
-        return side == PlayerSide.HUMAN_LEFT ? player1Mana : player2Mana;
+        return side == PlayerSide.HUMAN_LEFT
+                ? gameState.getPlayer1State().getMana()
+                : gameState.getPlayer2State().getMana();
     }
 }
