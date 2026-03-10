@@ -1,3 +1,5 @@
+package structures.basic;
+
 public enum PlayerSide {
     HUMAN_LEFT,
     AI_RIGHT;
