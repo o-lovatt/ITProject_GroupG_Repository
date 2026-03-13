@@ -13,7 +13,10 @@ public class GameState {
     public boolean gameInitalised = false;
 
     public boolean something = false;
+    public structures.basic.Unit selectedUnit = null;
+    public logic.UnitActionService actionService = new logic.UnitActionService(new logic.CombatResolver());
 
+    public logic.Board board = new logic.Board();
 
     public GameState() {
     } //TEMPORARY ONLY!

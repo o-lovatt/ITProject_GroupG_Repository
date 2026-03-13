@@ -10,8 +10,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  * or attack. The position is the physical position on the
  * board. UnitAnimationSet contains the underlying information
  * about the animation frames, while ImageCorrection has
- * information for centering the unit on the tile. 
- * 
+ * information for centering the unit on the tile.
+ *
  * @author Dr. Richard McCreadie
  *
  */
@@ -19,37 +19,41 @@ public class Unit {
 
 	@JsonIgnore
 	protected static ObjectMapper mapper = new ObjectMapper(); // Jackson Java Object Serializer, is used to read java objects from a file
-	
+
 	int id;
+	int health = 20; // Default health
+	int attack = 2;  // Default attack
+	boolean hasMoved = false;
+	boolean hasAttacked = false;
 	UnitAnimationType animation;
 	Position position;
 	UnitAnimationSet animations;
 	ImageCorrection correction;
-	
+
 	public Unit() {}
-	
+
 	public Unit(int id, UnitAnimationSet animations, ImageCorrection correction) {
 		super();
 		this.id = id;
 		this.animation = UnitAnimationType.idle;
-		
+
 		position = new Position(0,0,0,0);
 		this.correction = correction;
 		this.animations = animations;
 	}
-	
+
 	public Unit(int id, UnitAnimationSet animations, ImageCorrection correction, Tile currentTile) {
 		super();
 		this.id = id;
 		this.animation = UnitAnimationType.idle;
-		
+
 		position = new Position(currentTile.getXpos(),currentTile.getYpos(),currentTile.getTilex(),currentTile.getTiley());
 		this.correction = correction;
 		this.animations = animations;
 	}
-	
-	
-	
+
+
+
 	public Unit(int id, UnitAnimationType animation, Position position, UnitAnimationSet animations,
 			ImageCorrection correction) {
 		super();
@@ -96,7 +100,7 @@ public class Unit {
 	public void setAnimations(UnitAnimationSet animations) {
 		this.animations = animations;
 	}
-	
+
 	/**
 	 * This command sets the position of the Unit to a specified
 	 * tile.
@@ -106,6 +110,28 @@ public class Unit {
 	public void setPositionByTile(Tile tile) {
 		position = new Position(tile.getXpos(),tile.getYpos(),tile.getTilex(),tile.getTiley());
 	}
-	
-	
+	public int getHealth() {
+		return health;
+	}
+	public void setHealth(int health) {
+		this.health = health;
+	}
+	public int getAttack() {
+		return attack;
+	}
+	public void setAttack(int attack) {
+		this.attack = attack;
+	}
+	public boolean isHasMoved() {
+		return hasMoved;
+	}
+	public void setHasMoved(boolean hasMoved) {
+		this.hasMoved = hasMoved;
+	}
+	public boolean isHasAttacked() {
+		return hasAttacked;
+	}
+	public void setHasAttacked(boolean hasAttacked) {
+		this.hasAttacked = hasAttacked;
+	}
 }
