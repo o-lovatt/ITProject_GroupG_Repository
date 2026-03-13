@@ -9,9 +9,10 @@ import commands.BasicCommands;
 import structures.GameState;
 
 /**
- * Clicking anywhere else clears the current selection/highlights.
+ * Minimal end-turn behaviour for Member 2:
+ * just clear any board selection/highlight state.
  */
-public class OtherClicked implements EventProcessor {
+public class EndTurnClicked implements EventProcessor {
 
 	@Override
 	public void processEvent(ActorRef out, GameState gameState, JsonNode message) {

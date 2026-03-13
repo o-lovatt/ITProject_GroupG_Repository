@@ -4,14 +4,17 @@ import commands.BasicCommands;
 import structures.GameState;
 import akka.actor.ActorRef;
 import com.fasterxml.jackson.databind.JsonNode;
-import demo.CommandDemo;
-import structures.basic.Player;
+//import demo.CommandDemo;
+import structures.PlayerSide;
+//import structures.basic.Player;
 import utils.BasicObjectBuilders;
 import utils.StaticConfFiles;
 
-
 import structures.basic.Tile;
 import structures.basic.Unit;
+import logic.PlayerState;
+import logic.TurnManager;
+
 
 
 /**
@@ -27,97 +30,71 @@ import structures.basic.Unit;
  */
 public class Initalize implements EventProcessor{
 
-    //board rows & cols
-    private static final int B_COLS = 9;
-    private static final int B_ROWS = 5;
-    private static final int STARTING_HEALTH = 20;
-    private static final int STARTING_MANA = 0;
+    /// from zilu
+    @Override
+    public void processEvent(ActorRef out, GameState gameState, JsonNode message) {
 
-    //starting coordinates
-    // all corrdinates here need to be -1 e.g. [2, 3] = [1, 2]      [8, 3] = [7, 2]
-    private static final int HUMAN_AVATAR_X = 1; //this equals tile 2 on the board! (loadTile() counts from 1)
-    private static final int HUMAN_AVATAR_Y = 2; //same with all tiles below
-    private static final int AI_AVATAR_X    = 7;
-    private static final int AI_AVATAR_Y    = 2;
+        if (gameState.gameInitalised) {
+            return;
+        }
 
-	@Override
-	public void processEvent(ActorRef out, GameState gameState, JsonNode message) {
-		// hello this is a change
-		
-		gameState.gameInitalised = true;
-		
-		gameState.something = true;
-		
-		// User 1 makes a change
-		//CommandDemo.executeDemo(out); // this executes the command demo, comment out this when implementing your solution
-		//Loaders_2024_Check.test(out);
+        gameState.gameInitalised = true;
+        gameState.something = true;
 
-
-        /* TODO...
-        create board -> e.g. Board board = new Board()
-        create decks (human and ai) -> Deck human/aiDeck = CardLoader.getPlayer1/2Cards()
-        create avatars -> AvatarUnit human/aiAvatar = new AvatarUnit(??....)
-        create playerstates -> PlayerState human/aiState = new PlayerState(PlayerSide.HUMAN_LEFT/AI_RIGHT,human/aiAvatar, human/aiDeck)
-        place avatars on correct tiles - DONE
-        draw first hand
-
-         */
-
-        //create the board:
-        for(int x = 0; x < B_COLS; x++){
-            for(int y = 0; y < B_ROWS; y++){
+        // Draw the full 9x5 board and keep the tile objects in GameState.
+        for (int x = 1; x <= 9; x++) {
+            for (int y = 1; y <= 5; y++) {
                 Tile tile = BasicObjectBuilders.loadTile(x, y);
-                BasicCommands.drawTile(out, tile, 0); //should be unhighlighted? confirmed is unhighlighted
-
+                gameState.setTile(x, y, tile);
+                BasicCommands.drawTile(out, tile, 0);
             }
         }
 
-        //human initialization stuff
-        Tile humanTile = BasicObjectBuilders.loadTile(HUMAN_AVATAR_X, HUMAN_AVATAR_Y);//human goes at tile [2, 3]
-        Unit humanAvatar = BasicObjectBuilders.loadUnit(StaticConfFiles.humanAvatar, 0, Unit.class); //
-        humanAvatar.setPositionByTile(humanTile);
+        // Create both avatars and place them on mirrored start positions.
+        Unit humanAvatar = BasicObjectBuilders.loadUnit(StaticConfFiles.humanAvatar, 100, Unit.class);
+        Unit aiAvatar = BasicObjectBuilders.loadUnit(StaticConfFiles.aiAvatar, 200, Unit.class);
 
-        gameState.board.placeUnit(humanAvatar, HUMAN_AVATAR_X, HUMAN_AVATAR_Y);
+        gameState.humanAvatar = humanAvatar;
+        gameState.aiAvatar = aiAvatar;
 
-        BasicCommands.drawUnit(out, humanAvatar, humanTile);
-        try { Thread.sleep(50); } catch (InterruptedException e) { e.printStackTrace(); }
+        // Start positions used here: player 1 = [2,3], player 2 mirrored = [8,3]
+        gameState.placeUnit(humanAvatar, 2, 3);
+        gameState.placeUnit(aiAvatar, 8, 3);
+
+        BasicCommands.drawUnit(out, humanAvatar, gameState.getTile(2, 3));
+        BasicCommands.drawUnit(out, aiAvatar, gameState.getTile(8, 3));
+
+        // Display avatar combat stats (basic starting values).
         BasicCommands.setUnitAttack(out, humanAvatar, 2);
-        BasicCommands.setUnitHealth(out, humanAvatar, STARTING_HEALTH);
-
-        Player humanPlayer = new Player(STARTING_HEALTH, STARTING_MANA);
-        BasicCommands.setPlayer1Health(out, humanPlayer);
-        BasicCommands.setPlayer1Mana(out, humanPlayer);
-
-
-        //repeated for ai initialization stuff
-        Tile aiTile = BasicObjectBuilders.loadTile(AI_AVATAR_X, AI_AVATAR_Y);
-        Unit aiAvatar = BasicObjectBuilders.loadUnit(StaticConfFiles.aiAvatar, 1, Unit.class);
-
-        aiAvatar.setPositionByTile(aiTile);
-
-        // 1. Save to Board Memory
-        gameState.board.placeUnit(aiAvatar, AI_AVATAR_X, AI_AVATAR_Y);
-
+        BasicCommands.setUnitHealth(out, humanAvatar, 20);
         BasicCommands.setUnitAttack(out, aiAvatar, 2);
-        try { Thread.sleep(50); } catch (InterruptedException e) { e.printStackTrace(); }
-        BasicCommands.setUnitHealth(out, aiAvatar, STARTING_HEALTH);
-        BasicCommands.drawUnit(out, aiAvatar, aiTile);
+        BasicCommands.setUnitHealth(out, aiAvatar, 20);
 
-        Player aiPlayer = new Player(STARTING_HEALTH, STARTING_MANA);
-        BasicCommands.setPlayer2Health(out, aiPlayer);
-        BasicCommands.setPlayer2Mana(out, aiPlayer);
-
-        //health and attack aren't displaying on the circles at each avatar (on the board) ???
+        //attach playerstates to gamestate
+        /// TODO REPLACE NUL WITH CARD DECK WHEN THIS IXISTS
+        PlayerState humanState = new PlayerState(PlayerSide.HUMAN_LEFT, humanAvatar);
+        PlayerState aiState = new PlayerState(PlayerSide.AI_RIGHT, aiAvatar);
 
 
+        gameState.setHumanState(humanState);
+        gameState.setAiState(aiState);
 
+        gameState.setTurnManager(new TurnManager(gameState));
+        gameState.getTurnManager().startTurn();
 
+        //attach turnmanager to gamestate
+        gameState.player1.setMana(humanState.getMana());
+        gameState.player2.setMana(aiState.getMana());
 
+        // Draw player health/mana in the UI.
+        BasicCommands.setPlayer1Health(out, gameState.player1);
+        BasicCommands.setPlayer2Health(out, gameState.player2);
+        BasicCommands.setPlayer1Mana(out, gameState.player1);
+        BasicCommands.setPlayer2Mana(out, gameState.player2);
 
-
-
+        BasicCommands.addPlayer1Notification(out, "Game initialised", 2);
     }
-
 }
+
 
 

@@ -1,4 +1,4 @@
-package structures.basic;
+package structures;
 
 public enum PlayerSide {
     HUMAN_LEFT,
