@@ -8,13 +8,13 @@ import java.util.List;
 /**
  * Represents the set of cards currently held by a player.
  *
- * Rules to enforce:
+ * Rules enforced:
  *  - Maximum hand size is 6 cards.
  *  - If a card is drawn when the hand is already full, the drawn card is
  *    discarded (overdraw) and the hand is left unchanged.
  *  - Cards are removed from the hand when played or cast.
  *
- * This class does NOT call any UI commands itself — callers are responsible
+ * This class does NOT call any UI commands itself – callers are responsible
  * for updating the front-end after modifying the hand.
  */
 public class Hand {
@@ -30,7 +30,7 @@ public class Hand {
     // -----------------------------------------------------------------------
 
     public Hand() {
-        // TODO: initialise the cards list
+        this.cards = new ArrayList<>();
     }
 
     // -----------------------------------------------------------------------
@@ -40,41 +40,62 @@ public class Hand {
     /**
      * Attempts to add a card to the hand.
      *
-     * Steps:
-     *  1. Check the card is not null (throw IllegalArgumentException if so).
-     *  2. Check if the hand is full — if so, log an overdraw message and return false.
-     *  3. Otherwise add the card and return true.
-     *
-     * @param card the card to add.
-     * @return true if added, false if overdraw occurred.
+     * @param card the card to add; must not be null.
+     * @return {@code true} if the card was added successfully,
+     *         {@code false} if the hand was full (overdraw – card is discarded).
      */
     public boolean addCard(Card card) {
-        // TODO: implement overdraw logic
-        return false;
+        if (card == null) {
+            throw new IllegalArgumentException("Cannot add a null card to the hand.");
+        }
+        if (isFull()) {
+            // Overdraw: hand is full, discard the drawn card.
+            System.out.println("[Hand] Overdraw! Hand is full (" + MAX_HAND_SIZE
+                    + " cards). Card discarded: " + card.getCardname());
+            return false;
+        }
+        cards.add(card);
+        System.out.println("[Hand] Card added: " + card.getCardname()
+                + " | Hand size: " + cards.size());
+        return true;
     }
 
     /**
-     * Removes and returns the card at the given 0-based index.
+     * Removes and returns the card at the given hand position (0-based index).
      * Used when a card is played or cast.
      *
-     * @param index 0-based position in the hand.
-     * @return the removed Card.
-     * @throws IndexOutOfBoundsException if the index is invalid.
+     * @param index 0-based position of the card in the hand.
+     * @return the removed {@link Card}.
+     * @throws IndexOutOfBoundsException if the index is out of range.
      */
     public Card removeCardAt(int index) {
-        // TODO: validate index, remove and return the card
-        return null;
+        if (index < 0 || index >= cards.size()) {
+            throw new IndexOutOfBoundsException(
+                    "Invalid hand index: " + index + " (hand size: " + cards.size() + ")");
+        }
+        Card removed = cards.remove(index);
+        System.out.println("[Hand] Card played/removed: " + removed.getCardname()
+                + " | Hand size: " + cards.size());
+        return removed;
     }
 
     /**
      * Removes a specific card from the hand by reference.
+     * Used when a card is played or cast and the caller already holds a reference to it.
      *
      * @param card the card to remove.
-     * @return true if found and removed, false otherwise.
+     * @return {@code true} if the card was found and removed, {@code false} otherwise.
      */
     public boolean removeCard(Card card) {
-        // TODO: remove by reference and return result
-        return false;
+        boolean removed = cards.remove(card);
+        if (removed) {
+            System.out.println("[Hand] Card removed: " + card.getCardname()
+                    + " | Hand size: " + cards.size());
+        } else {
+            System.out.println("[Hand] Attempted to remove card not in hand: "
+                    + card.getCardname());
+        }
+        return removed;
     }
 
     // -----------------------------------------------------------------------
@@ -82,58 +103,62 @@ public class Hand {
     // -----------------------------------------------------------------------
 
     /**
-     * Returns the card at the given position without removing it.
+     * Returns the card at the given hand position without removing it.
      *
-     * @param index 0-based position in the hand.
-     * @return the Card at that position.
+     * @param index 0-based position of the card in the hand.
+     * @return the {@link Card} at that position.
      */
     public Card getCard(int index) {
-        // TODO: validate index and return the card
-        return null;
+        if (index < 0 || index >= cards.size()) {
+            throw new IndexOutOfBoundsException(
+                    "Invalid hand index: " + index + " (hand size: " + cards.size() + ")");
+        }
+        return cards.get(index);
     }
 
     /**
      * Returns an unmodifiable view of all cards currently in the hand.
-     * Useful for rendering without allowing direct mutation.
+     * Useful for rendering the hand in the UI without allowing direct mutation.
      */
     public List<Card> getCards() {
-        // TODO: return an unmodifiable list
-        return null;
+        return Collections.unmodifiableList(cards);
     }
 
     /** @return the number of cards currently in the hand. */
     public int getSize() {
-        // TODO
-        return 0;
+        return cards.size();
     }
 
-    /** @return true if the hand is at maximum capacity (6 cards). */
+    /** @return {@code true} if the hand is at maximum capacity (6 cards). */
     public boolean isFull() {
-        // TODO
-        return false;
+        return cards.size() >= MAX_HAND_SIZE;
     }
 
-    /** @return true if the hand contains no cards. */
+    /** @return {@code true} if the hand contains no cards. */
     public boolean isEmpty() {
-        // TODO
-        return false;
+        return cards.isEmpty();
     }
 
     /**
-     * Returns the 1-based hand position of a given card.
-     * Used to map a UI card click back to its hand slot.
+     * Returns the 1-based hand position index of a given card.
+     * Used to map a clicked card in the UI back to its hand slot.
      *
      * @param card the card to locate.
-     * @return 1-based index, or -1 if not found.
+     * @return 1-based index, or -1 if the card is not in the hand.
      */
     public int getHandPosition(Card card) {
-        // TODO: find the card, return index + 1 (or -1 if not found)
-        return -1;
+        int idx = cards.indexOf(card);
+        return (idx == -1) ? -1 : idx + 1;
     }
 
     @Override
     public String toString() {
-        // TODO: return a readable summary of the hand contents
-        return "Hand[]";
+        StringBuilder sb = new StringBuilder("Hand[" + cards.size() + "/" + MAX_HAND_SIZE + "]: ");
+        for (int i = 0; i < cards.size(); i++) {
+            sb.append("[").append(i).append("] ")
+              .append(cards.get(i).getCardname())
+              .append("(").append(cards.get(i).getManacost()).append(") ");
+        }
+        return sb.toString().trim();
     }
 }
