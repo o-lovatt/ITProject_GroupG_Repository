@@ -1,6 +1,7 @@
 package logic;
 
-
+import akka.actor.ActorRef;
+import structures.GameState;
 import structures.basic.Position;
 import structures.basic.Tile;
 import structures.basic.Unit;
@@ -39,7 +40,7 @@ public class UnitActionService {
     /**
      * Attempts to initiate an attack from one unit to another.
      */
-    public boolean performAttack(Unit attacker, Unit target) {
+    public boolean performAttack(ActorRef out, GameState gameState, Unit attacker, Unit target) {
         // TODO: Ensure attacker hasn't already attacked this turn
         //^^ implemented
         if(attacker.hasAttacked()){
@@ -51,7 +52,7 @@ public class UnitActionService {
             return false;
         }
 
-        combatResolver.executeAttack(attacker, target);
+        combatResolver.executeAttack(out, gameState, attacker, target);
         return true;
         // Attacking forfeits movement for the turn
         // TODO: attacker.setHasMoved(true);

@@ -8,6 +8,7 @@ import akka.actor.ActorRef;
 import commands.BasicCommands;
 import structures.GameState;
 import structures.PlayerSide;
+import logic.AIController;
 
 /**
  * Minimal end-turn behaviour for Member 2:
@@ -31,11 +32,14 @@ public class EndTurnClicked implements EventProcessor {
 		gameState.clearHighlights();
 		gameState.selectedUnit = null;
 
-
         //end turn and start next turn
         gameState.getTurnManager().endTurn();
         //update ui
         BasicCommands.setPlayer1Mana(out, gameState.player1);
         BasicCommands.setPlayer2Mana(out, gameState.player2);
+
+		if (gameState.getTurnManager().getActivePlayer() == PlayerSide.AI_RIGHT) {
+			AIController.playAITurn(out, gameState);
+		}
 	}
 }

@@ -2,93 +2,83 @@ package events;
 
 import java.util.ArrayList;
 import java.util.List;
-
 import com.fasterxml.jackson.databind.JsonNode;
-
 import akka.actor.ActorRef;
 import commands.BasicCommands;
 import structures.GameState;
 import structures.basic.Tile;
 import structures.basic.Unit;
 
-/**
- * Handles tile clicks for simple board interaction:
- * 1) click a unit to highlight adjacent empty tiles
- * 2) click a highlighted tile to move the selected unit there
- * 3) click anything else on the board to clear highlights
- */
 public class TileClicked implements EventProcessor {
 
 	@Override
 	public void processEvent(ActorRef out, GameState gameState, JsonNode message) {
-
-		if (!gameState.gameInitalised) {
-			return;
-		}
+		if (!gameState.gameInitalised) return;
 
 		int tilex = message.get("tilex").asInt();
 		int tiley = message.get("tiley").asInt();
 
-		if (!gameState.isInBounds(tilex, tiley)) {
-			return;
-		}
+		if (!gameState.isInBounds(tilex, tiley)) return;
+		if (gameState.unitMoving) return;
 
-		// Ignore click spam while a move animation is already in progress.
-		if (gameState.unitMoving) {
-			return;
-		}
-
-		// If a highlighted tile is clicked, move the selected unit.
-		if (gameState.selectedUnit != null && gameState.isHighlighted(tilex, tiley) && !gameState.hasUnitAt(tilex, tiley)) {
+		if (gameState.selectedUnit != null && gameState.isHighlighted(tilex, tiley)) {
 			clearHighlights(out, gameState);
 
 			Tile targetTile = gameState.getTile(tilex, tiley);
 			Unit selectedUnit = gameState.selectedUnit;
+			Unit targetUnit = gameState.getUnitAt(tilex, tiley);
 
-			gameState.unitMoving = true;
-			gameState.moveUnit(selectedUnit, tilex, tiley);
-			BasicCommands.moveUnitToTile(out, selectedUnit, targetTile);
+			if (targetUnit == null) {
+				gameState.unitMoving = true;
 
-			gameState.selectedUnit = null;
-			gameState.unitMoving = false;
+				BasicCommands.moveUnitToTile(out, selectedUnit, targetTile);
+				gameState.moveUnit(selectedUnit, tilex, tiley);
+
+				selectedUnit.setHasMoved(true);
+				gameState.selectedUnit = null;
+				gameState.unitMoving = false;
+
+			} else if (targetUnit.getId() != selectedUnit.getId()) {
+				logic.CombatResolver combat = new logic.CombatResolver();
+				combat.executeAttack(out, gameState, selectedUnit, targetUnit);
+				gameState.selectedUnit = null;
+			}
 			return;
 		}
 
 		Unit clickedUnit = gameState.getUnitAt(tilex, tiley);
-
-		// Clicking a unit selects it and highlights legal adjacent empty tiles.
 		if (clickedUnit != null) {
 			clearHighlights(out, gameState);
 			gameState.selectedUnit = clickedUnit;
-			highlightAdjacentEmptyTiles(out, gameState, tilex, tiley);
+
+			List<Tile> reachableTiles = logic.MovementLogic.getReachableTiles(gameState, clickedUnit);
+			for (Tile t : reachableTiles) {
+				gameState.addHighlight(t.getTilex(), t.getTiley());
+				BasicCommands.drawTile(out, t, 1);
+			}
+
+			int ux = clickedUnit.getPosition().getTilex();
+			int uy = clickedUnit.getPosition().getTiley();
+			for (int x = ux - 1; x <= ux + 1; x++) {
+				for (int y = uy - 1; y <= uy + 1; y++) {
+					if (gameState.isInBounds(x, y)) {
+						Unit target = gameState.getUnitAt(x, y);
+						if (target != null && target.getId() != clickedUnit.getId()) {
+							gameState.addHighlight(x, y);
+							BasicCommands.drawTile(out, gameState.getTile(x, y), 2);
+						}
+					}
+				}
+			}
 			return;
 		}
 
-		// Clicking an empty non-highlighted tile just clears current selection.
 		clearHighlights(out, gameState);
 		gameState.selectedUnit = null;
 	}
 
-	private void highlightAdjacentEmptyTiles(ActorRef out, GameState gameState, int x, int y) {
-		List<int[]> adjacentTiles = new ArrayList<int[]>();
-		adjacentTiles.add(new int[] { x + 1, y });
-		adjacentTiles.add(new int[] { x - 1, y });
-		adjacentTiles.add(new int[] { x, y + 1 });
-		adjacentTiles.add(new int[] { x, y - 1 });
-
-		for (int[] pos : adjacentTiles) {
-			int tx = pos[0];
-			int ty = pos[1];
-
-			if (gameState.isInBounds(tx, ty) && !gameState.hasUnitAt(tx, ty)) {
-				gameState.addHighlight(tx, ty);
-				BasicCommands.drawTile(out, gameState.getTile(tx, ty), 1);
-			}
-		}
-	}
-
 	private void clearHighlights(ActorRef out, GameState gameState) {
-		for (String key : new ArrayList<String>(gameState.highlightedTiles)) {
+		for (String key : new ArrayList<>(gameState.highlightedTiles)) {
 			String[] parts = key.split(",");
 			int x = Integer.parseInt(parts[0]);
 			int y = Integer.parseInt(parts[1]);
