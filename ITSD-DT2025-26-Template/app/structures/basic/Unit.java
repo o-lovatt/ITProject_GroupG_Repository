@@ -28,14 +28,33 @@ public class Unit {
 	ImageCorrection correction;
 
     private int health;
+    private int attack;
     private int maxHealth;
     private int attackPower;
+    private int owner;
     private boolean hasMoved;
     private boolean hasAttacked;//2 booleans added
+    private boolean isStunned;
+    private boolean isFlying;
+    private boolean hasProvoke;
+    private boolean hasRush;
+    private boolean hasZeal;
 
     private static final int DEFAULT_HEALTH = 20;
     private static final int DEFAULT_ATTACK = 2;
-	
+
+    public boolean isFlying() { return isFlying; }
+    public void setFlying(boolean flying) { isFlying = flying; }
+
+    public boolean hasProvoke() { return hasProvoke; }
+    public void setProvoke(boolean provoke) { hasProvoke = provoke; }
+
+    public boolean hasRush() { return hasRush; }
+    public void setRush(boolean rush) { hasRush = rush; }
+
+    public boolean hasZeal() { return hasZeal; }
+    public void setZeal(boolean zeal) { hasZeal = zeal; }
+
 	public Unit() {}
 
     public Unit(int id, UnitAnimationSet animations, ImageCorrection correction) {
@@ -88,6 +107,25 @@ public class Unit {
             this.maxHealth = maxHealth; //minor change from getMaxHealth -> maxHealth
         }
 
+    public int getAttack() {
+        return this.attack;
+    }
+
+    public void setAttack(int attack) {
+        this.attack = attack;
+    }
+    public void setHealth(int health) {
+        this.health = health;
+    }
+
+    public int getOwner() {
+        return owner;
+    }
+
+    public void setOwner(int owner) {
+        this.owner = owner;
+    }
+
         public void takeDamage(int damage){
             this.health = Math.max(0, this.health - damage);
         }
@@ -120,12 +158,19 @@ public class Unit {
         public void setHasAttacked(boolean hasAttacked) {
             this.hasAttacked = hasAttacked;
         }
-        public void resetTurnState() {
-            this.hasMoved = false;
-            this.hasAttacked = false;//resets turn flags
-        }
 
+    public boolean isStunned() {
+        return isStunned;
+    }
+    public void setStunned(boolean isStunned) {
+        this.isStunned = isStunned;
+    }
 
+    public void resetTurnState() {
+        this.hasMoved = false;
+        this.hasAttacked = false;
+        this.isStunned = false;
+    }
 
 	public int getId() {
 		return id;

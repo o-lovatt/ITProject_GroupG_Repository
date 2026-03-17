@@ -34,11 +34,12 @@ public class CombatResolver {
     }
 
     private void applyDamage(ActorRef out, GameState gameState, Unit unit, int damage) {
+        if (unit == null) return;
+
         unit.takeDamage(damage);
         System.out.println("Unit: " + unit.getId() + " get " + damage + " damage, health now: " + unit.getHealth());
 
         BasicCommands.playUnitAnimation(out, unit, UnitAnimationType.hit);
-
         BasicCommands.setUnitHealth(out, unit, unit.getHealth());
 
         if (unit.getId() == 1) {
@@ -56,7 +57,8 @@ public class CombatResolver {
             try { Thread.sleep(1000); } catch (InterruptedException e) { e.printStackTrace(); }
 
             BasicCommands.deleteUnit(out, unit);
-            // TODO: 这里将来需要调用 GameState 来移除 boardUnits 中的记录
+
+            gameState.removeUnit(unit.getPosition().getTilex(), unit.getPosition().getTiley());
         }
     }
 }

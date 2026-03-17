@@ -47,7 +47,8 @@ public class Initalize implements EventProcessor {
 
         gameState.placeUnit(humanAvatar, 2, 3);
         gameState.placeUnit(aiAvatar, 8, 3);
-
+        gameState.humanAvatar.setOwner(1);
+        gameState.aiAvatar.setOwner(2);
         BasicCommands.drawUnit(out, humanAvatar, gameState.getTile(2, 3));
         BasicCommands.drawUnit(out, aiAvatar, gameState.getTile(8, 3));
 
@@ -65,6 +66,18 @@ public class Initalize implements EventProcessor {
 
         gameState.player1.setHealth(20);
         gameState.player2.setHealth(20);
+
+        gameState.player1.deck = logic.CardFactory.createLyonarDeck();
+        gameState.player2.deck = logic.CardFactory.createLyonarDeck();
+
+        System.out.println("player card totally " + gameState.player1.deck.size() + " cards! ");
+
+        for (int i = 0; i < 3; i++) {
+            logic.HandService.drawCard(out, gameState.player1, true);
+            logic.HandService.drawCard(out, gameState.player2, false);
+        }
+
+        System.out.println("loading card " + gameState.player1.deck.size() + " total! ");
 
         BasicCommands.setPlayer1Health(out, gameState.player1);
         BasicCommands.setPlayer2Health(out, gameState.player2);
