@@ -9,7 +9,11 @@ public class AIActionScorer {
         int score = 0;
         if (action.target != null && action.target.getId() == 1) {
             score += 1000;
-        } else {
+        }
+        else if (action.target != null && action.target.hasProvoke()) {
+            score += 2000;
+        }
+        else {
             score += 500;
         }
         return score;
@@ -28,5 +32,10 @@ public class AIActionScorer {
         int distance = Math.abs(enemyX - moveX) + Math.abs(enemyY - moveY);
 
         return 100 - (distance * 10);
+    }
+
+    public static int scorePlayCard(AIPlayCardAction action) {
+
+        return 5000;
     }
 }

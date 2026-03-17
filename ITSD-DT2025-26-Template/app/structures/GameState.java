@@ -47,6 +47,7 @@ public class GameState {
     public Unit aiAvatar = null;
 
     public Unit selectedUnit = null;
+    public int selectedCardPosition = -1;
     public Set<String> highlightedTiles = new HashSet<String>();
 
     public boolean unitMoving = false;
