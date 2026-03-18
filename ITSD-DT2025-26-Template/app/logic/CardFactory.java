@@ -1,6 +1,5 @@
 package logic;
 
-package logic;
 
 import structures.basic.BigCard;
 import structures.basic.Card;
@@ -60,19 +59,29 @@ public class CardFactory {
 
     public static List<Card> buildHumanDeck() {
         List<Card> deck = new ArrayList<>();
-        int id = HUMAN_CARD_ID_START;
-        for (int copy = 0; copy < 2; copy++) {
-            deck.add(createCreatureCard(id++, "Bad Omen", 0, "conf/gameconfs/units/badomen.json"));
-            deck.add(createCreatureCard(id++, "Gloom Chaser", 2, "conf/gameconfs/units/gloomchaser.json"));
-            deck.add(createCreatureCard(id++, "Rock Pulveriser", 2, "conf/gameconfs/units/rockpulveriser.json"));
-            deck.add(createCreatureCard(id++, "Shadow Watcher", 3, "conf/gameconfs/units/shadowwatcher.json"));
-            deck.add(createCreatureCard(id++, "Nightsorrow Assassin", 3, "conf/gameconfs/units/nightsorrowassassin.json"));
-            deck.add(createCreatureCard(id++, "Bloodmoon Priestess", 4, "conf/gameconfs/units/bloodmoonpriestess.json"));
-            deck.add(createCreatureCard(id++, "Shadowdancer", 5, "conf/gameconfs/units/shadowdancer.json"));
-            deck.add(createSpellCard(id++, "Horn of the Forsaken", 1));
-            deck.add(createSpellCard(id++, "Wraithling Swarm", 3));
-            deck.add(createSpellCard(id++, "Dark Terminus", 4));
-        }
+
+        deck.add(BasicObjectBuilders.loadCard(StaticConfFiles.c_bad_omen, cardIdCounter++, Card.class));
+        deck.add(BasicObjectBuilders.loadCard(StaticConfFiles.c_horn_of_the_forsaken, cardIdCounter++, Card.class));
+        deck.add(BasicObjectBuilders.loadCard(StaticConfFiles.c_gloom_chaser, cardIdCounter++, Card.class));
+        deck.add(BasicObjectBuilders.loadCard(StaticConfFiles.c_shadow_watcher, cardIdCounter++, Card.class));
+        deck.add(BasicObjectBuilders.loadCard(StaticConfFiles.c_wraithling_swarm, cardIdCounter++, Card.class));
+        deck.add(BasicObjectBuilders.loadCard(StaticConfFiles.c_nightsorrow_assassin, cardIdCounter++, Card.class));
+        deck.add(BasicObjectBuilders.loadCard(StaticConfFiles.c_rock_pulveriser, cardIdCounter++, Card.class));
+        deck.add(BasicObjectBuilders.loadCard(StaticConfFiles.c_dark_terminus, cardIdCounter++, Card.class));
+        deck.add(BasicObjectBuilders.loadCard(StaticConfFiles.c_bloodmoon_priestess, cardIdCounter++, Card.class));
+        deck.add(BasicObjectBuilders.loadCard(StaticConfFiles.c_shadowdancer, cardIdCounter++, Card.class));
+
+        deck.add(BasicObjectBuilders.loadCard(StaticConfFiles.c_bad_omen, cardIdCounter++, Card.class));
+        deck.add(BasicObjectBuilders.loadCard(StaticConfFiles.c_horn_of_the_forsaken, cardIdCounter++, Card.class));
+        deck.add(BasicObjectBuilders.loadCard(StaticConfFiles.c_gloom_chaser, cardIdCounter++, Card.class));
+        deck.add(BasicObjectBuilders.loadCard(StaticConfFiles.c_shadow_watcher, cardIdCounter++, Card.class));
+        deck.add(BasicObjectBuilders.loadCard(StaticConfFiles.c_wraithling_swarm, cardIdCounter++, Card.class));
+        deck.add(BasicObjectBuilders.loadCard(StaticConfFiles.c_nightsorrow_assassin, cardIdCounter++, Card.class));
+        deck.add(BasicObjectBuilders.loadCard(StaticConfFiles.c_rock_pulveriser, cardIdCounter++, Card.class));
+        deck.add(BasicObjectBuilders.loadCard(StaticConfFiles.c_dark_terminus, cardIdCounter++, Card.class));
+        deck.add(BasicObjectBuilders.loadCard(StaticConfFiles.c_bloodmoon_priestess, cardIdCounter++, Card.class));
+        deck.add(BasicObjectBuilders.loadCard(StaticConfFiles.c_shadowdancer, cardIdCounter++, Card.class));
+
         Collections.shuffle(deck);
         System.out.println("[CardFactory] Human deck built: " + deck.size() + " cards.");
         return deck;

@@ -67,7 +67,7 @@ public class Initalize implements EventProcessor {
         gameState.player1.setHealth(20);
         gameState.player2.setHealth(20);
 
-        gameState.player1.deck = logic.CardFactory.createLyonarDeck();
+        gameState.player1.deck = logic.CardFactory.buildHumanDeck();
         gameState.player2.deck = logic.CardFactory.createLyonarDeck();
 
         System.out.println("player card totally " + gameState.player1.deck.size() + " cards! ");

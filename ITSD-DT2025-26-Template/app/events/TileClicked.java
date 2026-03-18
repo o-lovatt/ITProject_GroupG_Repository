@@ -27,6 +27,10 @@ public class TileClicked implements EventProcessor {
 
 		if (gameState.unitMoving) return;
 
+		if (logic.HumanCardLogic.handleTileClicked(out, gameState, tilex, tiley)) {
+    		return;
+		}
+
 		if (gameState.selectedCardPosition > 0 && gameState.isHighlighted(tilex, tiley)) {
 			Card cardToPlay = gameState.player1.getCardByHandPosition(gameState.selectedCardPosition);
 			if (cardToPlay == null) { gameState.selectedCardPosition = -1; clearHighlights(out, gameState); return; }

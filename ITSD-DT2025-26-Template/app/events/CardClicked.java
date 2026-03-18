@@ -32,6 +32,9 @@ public class CardClicked implements EventProcessor {
 
 		Card clickedCard = gameState.player1.getCardByHandPosition(handPosition);
 		if (clickedCard == null) return;
+		if (logic.HumanCardLogic.handleCardClicked(out, gameState, handPosition, clickedCard)) {
+    		return;
+		}
 
 		String unitConf = logic.CardFactory.getUnitConfigByCardName(clickedCard.getCardname());
 		boolean isSpell = (unitConf == null);

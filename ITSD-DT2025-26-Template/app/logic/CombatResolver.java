@@ -16,6 +16,16 @@ public class CombatResolver {
         try { Thread.sleep(1000); } catch (InterruptedException e) { e.printStackTrace(); }
 
         applyDamage(out, gameState, target, attacker.getAttackPower());
+
+        // 新增：Human Horn on-hit / avatar damaged / target death
+        logic.HumanCardLogic.handleAfterAttackDamage(out, gameState, attacker, target);
+        if (target.getId() == 1) {
+            logic.HumanCardLogic.handleAvatarDamaged(out, gameState, target);
+        }
+        if (target.isDead()) {
+            logic.HumanCardLogic.handleUnitDeath(out, gameState, target);
+        }
+
         attacker.setHasAttacked(true);
         attacker.setHasMoved(true);
 
@@ -26,6 +36,14 @@ public class CombatResolver {
                 try { Thread.sleep(1000); } catch (InterruptedException e) { e.printStackTrace(); }
 
                 applyDamage(out, gameState, attacker, target.getAttackPower());
+
+                // 新增：counter damage 后 human avatar robustness / attacker death
+                if (attacker.getId() == 1) {
+                    logic.HumanCardLogic.handleAvatarDamaged(out, gameState, attacker);
+                }
+                if (attacker.isDead()) {
+                    logic.HumanCardLogic.handleUnitDeath(out, gameState, attacker);
+                }
             }
         }
 
