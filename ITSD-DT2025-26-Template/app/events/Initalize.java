@@ -35,11 +35,13 @@ public class Initalize implements EventProcessor {
         Unit humanAvatar = BasicObjectBuilders.loadUnit(StaticConfFiles.humanAvatar, 1, Unit.class);
         humanAvatar.setMaxHealth(20);
         humanAvatar.heal(20);
+        humanAvatar.setAttack(2);
         humanAvatar.setAttackPower(2);
 
         Unit aiAvatar = BasicObjectBuilders.loadUnit(StaticConfFiles.aiAvatar, 2, Unit.class);
         aiAvatar.setMaxHealth(20);
         aiAvatar.heal(20);
+        aiAvatar.setAttack(2);
         aiAvatar.setAttackPower(2);
 
         gameState.humanAvatar = humanAvatar;
@@ -99,4 +101,3 @@ public class Initalize implements EventProcessor {
         }).start();
     }
 }
-

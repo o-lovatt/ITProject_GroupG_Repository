@@ -1,7 +1,5 @@
 package logic;
 
-package logic;
-
 import structures.basic.BigCard;
 import structures.basic.Card;
 import structures.basic.MiniCard;

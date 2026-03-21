@@ -63,13 +63,23 @@ public class TileClicked implements EventProcessor {
 
 				gameState.placeUnit(summonedUnit, tilex, tiley);
 				BasicCommands.drawUnit(out, summonedUnit, targetTile);
-				try { Thread.sleep(100); } catch (Exception e) {}
+				try {
+					Thread.sleep(100);
+				} catch (Exception e) {
+				}
 				BasicCommands.setUnitHealth(out, summonedUnit, summonedUnit.getHealth());
 				BasicCommands.setUnitAttack(out, summonedUnit, summonedUnit.getAttack());
-
-				summonedUnit.setHasMoved(true);
-				summonedUnit.setHasAttacked(true);
-			} else {
+				if (cardToPlay.getCardname().contains("Tiger")) {
+					summonedUnit.setHasMoved(false);
+					summonedUnit.setHasAttacked(false);
+					BasicCommands.addPlayer1Notification(out, "RUSH!", 2);
+				}
+				else {
+					summonedUnit.setHasMoved(true);
+					summonedUnit.setHasAttacked(true);
+				}
+			}
+			else {
 				Unit targetUnit = gameState.getUnitAt(tilex, tiley);
 				if (targetUnit != null) {
 					executeSpell(out, gameState, cardToPlay, targetUnit, gameState.getTile(tilex, tiley));

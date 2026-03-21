@@ -15,7 +15,7 @@ public class CombatResolver {
         BasicCommands.playUnitAnimation(out, attacker, UnitAnimationType.attack);
         try { Thread.sleep(1000); } catch (InterruptedException e) { e.printStackTrace(); }
 
-        applyDamage(out, gameState, target, attacker.getAttackPower());
+        applyDamage(out, gameState, target, attacker.getAttack());
         attacker.setHasAttacked(true);
         attacker.setHasMoved(true);
 
@@ -25,7 +25,7 @@ public class CombatResolver {
                 BasicCommands.playUnitAnimation(out, target, UnitAnimationType.attack);
                 try { Thread.sleep(1000); } catch (InterruptedException e) { e.printStackTrace(); }
 
-                applyDamage(out, gameState, attacker, target.getAttackPower());
+                applyDamage(out, gameState, attacker, target.getAttack());
             }
         }
 
