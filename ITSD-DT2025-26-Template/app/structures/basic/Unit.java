@@ -55,6 +55,8 @@ public class Unit {
     public boolean hasZeal() { return hasZeal; }
     public void setZeal(boolean zeal) { hasZeal = zeal; }
 
+    public boolean isProvoke = false;
+
 	public Unit() {}
 
     public Unit(int id, UnitAnimationSet animations, ImageCorrection correction) {

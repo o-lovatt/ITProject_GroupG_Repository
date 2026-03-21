@@ -10,6 +10,9 @@ public class EndTurnClicked implements EventProcessor {
 
 	@Override
 	public void processEvent(ActorRef out, GameState gameState, JsonNode message) {
+		if (gameState.isGameOver()) {
+			return;
+		}
 		if (!gameState.gameInitalised) return;
 
 		if (gameState.getTurnManager().getActivePlayer() != PlayerSide.HUMAN_LEFT || gameState.unitMoving) {

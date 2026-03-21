@@ -8,52 +8,69 @@ import structures.basic.Unit;
 
 public class AILegalActionGenerator {
 
-    public static List<AIMoveAction> getLegalMoves(GameState gameState, Unit aiUnit) {
-        List<AIMoveAction> moves = new ArrayList<>();
+    public static List<AIMoveAction> getLegalMoves(GameState gameState, Unit unit) {
+        List<AIMoveAction> validMoves = new ArrayList<>();
+        if (unit == null || unit.hasMoved()) return validMoves;
 
-        if (aiUnit.hasMoved()) {
-            return moves;
+        int ux = unit.getPosition().getTilex();
+        int uy = unit.getPosition().getTiley();
+
+        for (int x = ux - 1; x <= ux + 1; x++) {
+            for (int y = uy - 1; y <= uy + 1; y++) {
+                if (gameState.isInBounds(x, y)) {
+                    Unit neighbor = gameState.getUnitAt(x, y);
+                    if (neighbor != null && neighbor.getOwner() != unit.getOwner() && neighbor.isProvoke) {
+                        return validMoves;
+                    }
+                }
+            }
         }
 
-        List<Tile> reachable = MovementLogic.getReachableTiles(gameState, aiUnit);
+        List<Tile> reachable = logic.MovementLogic.getReachableTiles(gameState, unit);
         for (Tile t : reachable) {
-            moves.add(new AIMoveAction(aiUnit, t));
+            validMoves.add(new AIMoveAction(unit, t));
         }
 
-        return moves;
+        return validMoves;
     }
 
-    public static List<AIAttackAction> getLegalAttacks(GameState gameState, Unit aiUnit) {
-        List<AIAttackAction> attacks = new ArrayList<>();
+    public static List<AIAttackAction> getLegalAttacks(GameState gameState, Unit unit) {
+        List<AIAttackAction> validAttacks = new ArrayList<>();
+        if (unit == null || unit.hasAttacked()) return validAttacks;
 
-        if (aiUnit.hasAttacked()) {
-            return attacks;
+        int ux = unit.getPosition().getTilex();
+        int uy = unit.getPosition().getTiley();
+
+        List<Unit> adjacentProvokers = new ArrayList<>();
+        for (int x = ux - 1; x <= ux + 1; x++) {
+            for (int y = uy - 1; y <= uy + 1; y++) {
+                if (gameState.isInBounds(x, y)) {
+                    Unit target = gameState.getUnitAt(x, y);
+                    if (target != null && target.getOwner() != unit.getOwner() && target.isProvoke) {
+                        adjacentProvokers.add(target);
+                    }
+                }
+            }
         }
 
-        int ux = aiUnit.getPosition().getTilex();
-        int uy = aiUnit.getPosition().getTiley();
-
-        boolean amIProvoked = MovementLogic.isProvoked(gameState, aiUnit);
+        if (!adjacentProvokers.isEmpty()) {
+            for (Unit provoker : adjacentProvokers) {
+                validAttacks.add(new AIAttackAction(unit, provoker));
+            }
+            return validAttacks;
+        }
 
         for (int x = ux - 1; x <= ux + 1; x++) {
             for (int y = uy - 1; y <= uy + 1; y++) {
                 if (gameState.isInBounds(x, y)) {
                     Unit target = gameState.getUnitAt(x, y);
-
-                    if (target != null && target.getId() == 1) {
-
-                        if (amIProvoked) {
-                            if (target.hasProvoke()) {
-                                attacks.add(new AIAttackAction(aiUnit, target));
-                            }
-                        } else {
-                            attacks.add(new AIAttackAction(aiUnit, target));
-                        }
+                    if (target != null && target.getOwner() != unit.getOwner()) {
+                        validAttacks.add(new AIAttackAction(unit, target));
                     }
                 }
             }
         }
-        return attacks;
+        return validAttacks;
     }
 
     public static List<AIPlayCardAction> getLegalCardPlays(GameState gameState) {

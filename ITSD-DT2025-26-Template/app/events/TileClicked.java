@@ -14,6 +14,9 @@ public class TileClicked implements EventProcessor {
 
 	@Override
 	public void processEvent(ActorRef out, GameState gameState, JsonNode message) {
+		if (gameState.isGameOver()) {
+			return;
+		}
 		if (!gameState.gameInitalised) return;
 
 		if (gameState.getTurnManager().getActivePlayer() != structures.PlayerSide.HUMAN_LEFT) {
@@ -78,6 +81,17 @@ public class TileClicked implements EventProcessor {
 					summonedUnit.setHasMoved(true);
 					summonedUnit.setHasAttacked(true);
 				}
+				String cardName = cardToPlay.getCardname();
+				if (cardName.contains("Entangler") ||
+						cardName.contains("Guardian") ||
+						cardName.contains("Knight") ||
+						cardName.contains("Pulveriser")) {
+
+					summonedUnit.isProvoke = true;
+
+					BasicCommands.playEffectAnimation(out, utils.BasicObjectBuilders.loadEffect(utils.StaticConfFiles.f1_buff), targetTile);
+					BasicCommands.addPlayer1Notification(out, "PROVOKE!", 2);
+				}
 			}
 			else {
 				Unit targetUnit = gameState.getUnitAt(tilex, tiley);
@@ -122,24 +136,52 @@ public class TileClicked implements EventProcessor {
 
 			gameState.selectedUnit = clickedUnit;
 
-			if (!clickedUnit.hasMoved()) {
-				List<Tile> reachableTiles = logic.MovementLogic.getReachableTiles(gameState, clickedUnit);
-				for (Tile t : reachableTiles) {
-					gameState.addHighlight(t.getTilex(), t.getTiley());
-					BasicCommands.drawTile(out, t, 1);
+			boolean isProvoked = false;
+			List<Unit> adjacentProvokers = new ArrayList<>();
+			int ux = clickedUnit.getPosition().getTilex();
+			int uy = clickedUnit.getPosition().getTiley();
+
+			for (int x = ux - 1; x <= ux + 1; x++) {
+				for (int y = uy - 1; y <= uy + 1; y++) {
+					if (gameState.isInBounds(x, y)) {
+						Unit neighbor = gameState.getUnitAt(x, y);
+						if (neighbor != null && neighbor.getOwner() != clickedUnit.getOwner() && neighbor.isProvoke) {
+							isProvoked = true;
+							adjacentProvokers.add(neighbor);
+						}
+					}
 				}
 			}
 
-			if (!clickedUnit.hasAttacked()) {
-				int ux = clickedUnit.getPosition().getTilex();
-				int uy = clickedUnit.getPosition().getTiley();
-				for (int x = ux - 1; x <= ux + 1; x++) {
-					for (int y = uy - 1; y <= uy + 1; y++) {
-						if (gameState.isInBounds(x, y)) {
-							Unit target = gameState.getUnitAt(x, y);
-							if (target != null && target.getOwner() != clickedUnit.getOwner()) {
-								gameState.addHighlight(x, y);
-								BasicCommands.drawTile(out, gameState.getTile(x, y), 2);
+			if (isProvoked) {
+				BasicCommands.addPlayer1Notification(out, "Provoked! Must attack!", 2);
+
+				if (!clickedUnit.hasAttacked()) {
+					for (Unit provoker : adjacentProvokers) {
+						int px = provoker.getPosition().getTilex();
+						int py = provoker.getPosition().getTiley();
+						gameState.addHighlight(px, py);
+						BasicCommands.drawTile(out, gameState.getTile(px, py), 2);
+					}
+				}
+			} else {
+				if (!clickedUnit.hasMoved()) {
+					List<Tile> reachableTiles = logic.MovementLogic.getReachableTiles(gameState, clickedUnit);
+					for (Tile t : reachableTiles) {
+						gameState.addHighlight(t.getTilex(), t.getTiley());
+						BasicCommands.drawTile(out, t, 1);
+					}
+				}
+
+				if (!clickedUnit.hasAttacked()) {
+					for (int x = ux - 1; x <= ux + 1; x++) {
+						for (int y = uy - 1; y <= uy + 1; y++) {
+							if (gameState.isInBounds(x, y)) {
+								Unit target = gameState.getUnitAt(x, y);
+								if (target != null && target.getOwner() != clickedUnit.getOwner()) {
+									gameState.addHighlight(x, y);
+									BasicCommands.drawTile(out, gameState.getTile(x, y), 2);
+								}
 							}
 						}
 					}

@@ -57,8 +57,15 @@ public class CombatResolver {
             try { Thread.sleep(1000); } catch (InterruptedException e) { e.printStackTrace(); }
 
             BasicCommands.deleteUnit(out, unit);
-
             gameState.removeUnit(unit.getPosition().getTilex(), unit.getPosition().getTiley());
+
+            if (unit.getId() == 1) {
+                BasicCommands.addPlayer1Notification(out, "GAME OVER - YOU LOSE!", 100);
+                gameState.setGameOver(structures.PlayerSide.AI_RIGHT); // 使用 GameState 自带的方法！
+            } else if (unit.getId() == 2) {
+                BasicCommands.addPlayer1Notification(out, "VICTORY - YOU WIN!", 100);
+                gameState.setGameOver(structures.PlayerSide.HUMAN_LEFT); // 使用 GameState 自带的方法！
+            }
         }
     }
 }
