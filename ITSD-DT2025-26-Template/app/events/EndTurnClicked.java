@@ -1,45 +1,34 @@
 package events;
 
-import java.util.ArrayList;
-
 import com.fasterxml.jackson.databind.JsonNode;
-
 import akka.actor.ActorRef;
 import commands.BasicCommands;
 import structures.GameState;
 import structures.PlayerSide;
-import logic.AIController;
+import logic.TurnManager;
 
-/**
- * Minimal end-turn behaviour for Member 2:
- * just clear any board selection/highlight state.
- */
 public class EndTurnClicked implements EventProcessor {
 
 	@Override
 	public void processEvent(ActorRef out, GameState gameState, JsonNode message) {
-		if(!gameState.gameInitalised)
-            return;
-        if(gameState.isGameOver())
-            return;
+		if (!gameState.gameInitalised) return;
 
-        for (String key : new ArrayList<String>(gameState.highlightedTiles)) {
-			String[] parts = key.split(",");
-			int x = Integer.parseInt(parts[0]);
-			int y = Integer.parseInt(parts[1]);
-			BasicCommands.drawTile(out, gameState.getTile(x, y), 0);
+		if (gameState.getTurnManager().getActivePlayer() != PlayerSide.HUMAN_LEFT || gameState.unitMoving) {
+			return;
 		}
-		gameState.clearHighlights();
+
 		gameState.selectedUnit = null;
+		gameState.selectedCardPosition = -1;
 
-        //end turn and start next turn
-        gameState.getTurnManager().endTurn();
-        //update ui
-        BasicCommands.setPlayer1Mana(out, gameState.player1);
-        BasicCommands.setPlayer2Mana(out, gameState.player2);
+		gameState.getTurnManager().endTurn();
 
-		if (gameState.getTurnManager().getActivePlayer() == PlayerSide.AI_RIGHT) {
-			AIController.playAITurn(out, gameState);
-		}
+
+//		gameState.player2.setMana(gameState.player2.maxMana);
+//		BasicCommands.setPlayer1Mana(out, gameState.player1);
+//		BasicCommands.setPlayer2Mana(out, gameState.player2);
+
+
+		logic.HandService.drawCard(out, gameState.player2, false);
+		logic.AIController.playAITurn(out, gameState);
 	}
 }

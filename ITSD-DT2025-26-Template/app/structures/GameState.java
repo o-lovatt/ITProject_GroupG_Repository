@@ -21,9 +21,7 @@ public class GameState {
 
     public boolean something = false;
 
-//}//remove this bracket later
-
-
+    //player state - avatar ref and mana from PlayerState
     //private Board board; now redundant
     private PlayerState humanState;
     private PlayerState aiState;
@@ -47,13 +45,14 @@ public class GameState {
     public Unit aiAvatar = null;
 
     public Unit selectedUnit = null;
+    public int selectedCardPosition = -1;
     public Set<String> highlightedTiles = new HashSet<String>();
 
     public boolean unitMoving = false;
 
     public GameState() {//TEMPORARY ONLY!
-        this.humanState = humanState;
-        this.aiState = aiState;
+        //this.humanState = humanState; //removed, player assignments now happen in intialize
+        //this.aiState = aiState;
         this.activePlayer = PlayerSide.HUMAN_LEFT;
         this.turnNumber = 1; //or 0 ??
         this.currentPhase = GamePhase.START_TURN;
@@ -235,6 +234,16 @@ public class GameState {
             this.turnManager = tm;
         }
 
+        //made more send for this to be in turn stuff not game over stuff
+        public void advanceTurn(){
+            if (activePlayer == PlayerSide.HUMAN_LEFT) {
+                this.activePlayer = PlayerSide.AI_RIGHT;
+            }else{
+                this.activePlayer = PlayerSide.HUMAN_LEFT;
+            }
+            this.turnNumber++;
+        }//switches player and increments turn
+
 
         //game over stuff
         public boolean isGameOver(){
@@ -246,21 +255,14 @@ public class GameState {
             }
 
         public void checkWinner(){
-            if (humanState.isDefeated()){
+            if (humanState != null || humanState.isDefeated()){
                 setGameOver(PlayerSide.AI_RIGHT);
-            } else if (aiState.isDefeated()) {
+            } else if (aiState != null && aiState.isDefeated()) { //bug fixed
                 setGameOver(PlayerSide.HUMAN_LEFT);
             }//checks if either player has been defeated
         }//sets game over and the winner
 
-        public void advanceTurn(){
-            if (activePlayer == PlayerSide.HUMAN_LEFT) {
-                this.activePlayer = PlayerSide.AI_RIGHT;
-            }else{
-                this.activePlayer = PlayerSide.HUMAN_LEFT;
-            }
-            this.turnNumber++;
-        }//switches player and increments turn
+
 
 
         public void setGameOver(PlayerSide winner){

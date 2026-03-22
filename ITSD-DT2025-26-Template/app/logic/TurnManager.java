@@ -20,13 +20,15 @@ public class TurnManager {
         this.gameState = gameState;
         this.currentTurn = 1;
         this.activePlayer = PlayerSide.HUMAN_LEFT;
-        this.gameState.getHumanState().setManaForTurn(currentTurn);
-        this.gameState.getAiState().setManaForTurn(currentTurn); //minor name changes to align with new methods
+//        this.gameState.getHumanState().setManaForTurn(currentTurn);
+//        this.gameState.getAiState().setManaForTurn(currentTurn); //minor name changes to align with new methods
+        //mana no longer being set here
     }
 
     public void startTurn(){
         addMana();
         //action flags for deck/hand are reset here when they exist
+        //^^ now handled by HandService
     }
 
     /**
@@ -35,9 +37,13 @@ public class TurnManager {
      */
     public void addMana() {
         if (activePlayer == PlayerSide.HUMAN_LEFT) {
-            gameState.getHumanState().setManaForTurn(Math.min(currentTurn + 1, 9));
+            gameState.getHumanState().setManaForTurn(currentTurn);
+            gameState.player1.setMana(gameState.getHumanState().getMana());
+            gameState.player1.maxMana = gameState.getHumanState().getMana();
         } else {
-            gameState.getAiState().setManaForTurn(Math.min(currentTurn + 1, 9));
+            gameState.getAiState().setManaForTurn(currentTurn);
+            gameState.player2.setMana(gameState.getAiState().getMana());
+            gameState.player2.maxMana = gameState.getAiState().getMana();
         }
     }
 

@@ -11,19 +11,23 @@ public class PlayerState {
     private final Unit avatar; ///DOES THIS NEED TO BE AVATAR UNIT?
     //private int health; ???
     private int mana;
-    //private final Deck deck; ///TODO uncomment when these classes ar ready
-    //private final Hand hand;
+    private final Deck deck; ///TODO uncomment when these classes ar ready
+    private final Hand hand;
 
-    public PlayerState(PlayerSide side, Unit avatar) { /// add deck in again later
+    public PlayerState(PlayerSide side, Unit avatar, Deck deck) { /// add deck in again later
         this.side = side;
         this.avatar = avatar;
         //this.health = INITIAL_HEALTH;
         this.mana = INITIAL_MANA;
-        //this.deck = deck;
-        //this.hand = new Hand();
+        this.deck = deck;
+        this.hand = new Hand();
         //this.avatar = setOwnerState(this);//so avatar can reference its owner
         //is this needed? not sure if this syntax will work
     }
+
+    public PlayerState(PlayerSide side, Unit avatar) {
+        this(side, avatar, null);
+    }//constructor for convinience,  passes null for deck
 
 
         //health stuff
@@ -72,13 +76,13 @@ public class PlayerState {
 
         /// TODO DRAW CARD STUFF
 
-//        public Deck getDeck(){
-//            return deck;
-//        }
-//
-//        public Hand getHand(){
-//            return hand;
-//        }
+        public Deck getDeck(){
+            return deck;
+        }
+
+        public Hand getHand(){
+            return hand;
+        }
 
         //get avatar
         public Unit getAvatar(){

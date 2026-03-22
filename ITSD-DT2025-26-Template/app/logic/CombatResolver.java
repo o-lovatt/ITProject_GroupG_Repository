@@ -3,6 +3,7 @@ package logic;
 import akka.actor.ActorRef;
 import commands.BasicCommands;
 import structures.GameState;
+import structures.PlayerSide;
 import structures.basic.Unit;
 import structures.basic.UnitAnimationType;
 
@@ -16,6 +17,16 @@ public class CombatResolver {
         try { Thread.sleep(1000); } catch (InterruptedException e) { e.printStackTrace(); }
 
         applyDamage(out, gameState, target, attacker.getAttackPower());
+
+        // 新增：Human Horn on-hit / avatar damaged / target death
+        logic.HumanCardLogic.handleAfterAttackDamage(out, gameState, attacker, target);
+        if (target.getId() == 1) {
+            logic.HumanCardLogic.handleAvatarDamaged(out, gameState, target);
+        }
+        if (target.isDead()) {
+            logic.HumanCardLogic.handleUnitDeath(out, gameState, target);
+        }
+
         attacker.setHasAttacked(true);
         attacker.setHasMoved(true);
 
@@ -26,6 +37,14 @@ public class CombatResolver {
                 try { Thread.sleep(1000); } catch (InterruptedException e) { e.printStackTrace(); }
 
                 applyDamage(out, gameState, attacker, target.getAttackPower());
+
+                // 新增：counter damage 后 human avatar robustness / attacker death
+                if (attacker.getId() == 1) {
+                    logic.HumanCardLogic.handleAvatarDamaged(out, gameState, attacker);
+                }
+                if (attacker.isDead()) {
+                    logic.HumanCardLogic.handleUnitDeath(out, gameState, attacker);
+                }
             }
         }
 
@@ -34,11 +53,12 @@ public class CombatResolver {
     }
 
     private void applyDamage(ActorRef out, GameState gameState, Unit unit, int damage) {
+        if (unit == null) return;
+
         unit.takeDamage(damage);
         System.out.println("Unit: " + unit.getId() + " get " + damage + " damage, health now: " + unit.getHealth());
 
         BasicCommands.playUnitAnimation(out, unit, UnitAnimationType.hit);
-
         BasicCommands.setUnitHealth(out, unit, unit.getHealth());
 
         if (unit.getId() == 1) {
@@ -56,7 +76,17 @@ public class CombatResolver {
             try { Thread.sleep(1000); } catch (InterruptedException e) { e.printStackTrace(); }
 
             BasicCommands.deleteUnit(out, unit);
-            // TODO: 这里将来需要调用 GameState 来移除 boardUnits 中的记录
+            gameState.removeUnit(unit.getPosition().getTilex(), unit.getPosition().getTiley());
+
+            if (unit.getId() == 1) {
+                BasicCommands.addPlayer1Notification(out, "GAME OVER -YOU LOSE!", 100);
+                gameState.setGameOver(structures.PlayerSide.AI_RIGHT);
+            }else if(unit.getId() == 2){
+                BasicCommands.addPlayer1Notification(out, "GAME OVER - YOU WIN!", 100);
+                gameState.setGameOver(structures.PlayerSide.HUMAN_LEFT);
+                //original gameState.checkWinner() line wasn't doing anything
+                //replaced with this now
+            }
         }
     }
 }
