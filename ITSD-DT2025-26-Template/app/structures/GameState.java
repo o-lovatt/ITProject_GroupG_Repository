@@ -255,7 +255,7 @@ public class GameState {
             }
 
         public void checkWinner(){
-            if (humanState != null || humanState.isDefeated()){
+            if (humanState != null && humanState.isDefeated()){//bug - or instead of and
                 setGameOver(PlayerSide.AI_RIGHT);
             } else if (aiState != null && aiState.isDefeated()) { //bug fixed
                 setGameOver(PlayerSide.HUMAN_LEFT);

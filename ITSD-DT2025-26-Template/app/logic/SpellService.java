@@ -3,6 +3,7 @@ package logic;
 import akka.actor.ActorRef;
 import commands.BasicCommands;
 import structures.GameState;
+import structures.PlayerSide;
 import structures.basic.Unit;
 import structures.basic.UnitAnimationType;
 
@@ -29,9 +30,21 @@ public class SpellService {
             BasicCommands.playUnitAnimation(out, target, UnitAnimationType.death);
             try { Thread.sleep(1000); } catch (InterruptedException e) { e.printStackTrace(); }
             BasicCommands.deleteUnit(out, target);
-            if (target.getId() == 1 || target.getId() == 2) {
-                gameState.checkWinner();
+
+            gameState.removeUnit(target.getPosition().getTilex(), target.getPosition().getTiley());
+
+            HumanCardLogic.handleUnitDeath(out, gameState, target);
+
+//            if (target.getId() == 1 || target.getId() == 2) {
+//                gameState.checkWinner();
+            if(target.getId() == 1) {
+                BasicCommands.addPlayer1Notification(out, "GAME OVER - YOU LOSE!", 100);
+                gameState.setGameOver(structures.PlayerSide.AI_RIGHT);
+            }else if(target.getId() == 2){
+                BasicCommands.addPlayer1Notification(out, "GAME OVER - YOU WIN", 100);
+                gameState.setGameOver(structures.PlayerSide.HUMAN_LEFT); //added this to fix a bug, ghost dead summons were left on the board
             }
+            return;
         }
 
         BasicCommands.playUnitAnimation(out, target, UnitAnimationType.idle);
@@ -43,7 +56,7 @@ public class SpellService {
         BasicCommands.playUnitAnimation(out, target, UnitAnimationType.channel);
         try { Thread.sleep(1000); } catch (InterruptedException e) { e.printStackTrace(); }
 
-        target.heal(5);
+        target.heal(4); //minor bug fix, was 5
         BasicCommands.setUnitHealth(out, target, target.getHealth());
 
         if (target.getId() == 1) {

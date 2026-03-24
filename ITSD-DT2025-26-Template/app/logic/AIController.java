@@ -210,8 +210,9 @@ public class AIController {
                     for (int y = 1; y <= 5; y++) {
                         Unit u = gameState.getUnitAt(x, y);
                         if (u != null) {
-                            u.resetTurnState(); //small edit to include stun check
-
+                            u.resetMoveandAttack(); //small edit to include stun check
+                            //second fix, stun shouldn't be cleared here, changes to resetMoveandAttack
+                            //clearStun is now in EndTurnClicked
                         }
                     }
                 }
@@ -256,7 +257,10 @@ public class AIController {
 
     private static void applyAIUnitKeywords(Unit unit, String cardName) {
         if (cardName == null) return;
-        if (cardName.contains("Entangler") || cardName.contains("Knight")) {
+        if (cardName.contains("Entangler")){
+            unit.setProvoke(true);
+            //unit.setZeal(true);//entangler doesn't have zeal
+        }else if(cardName.contains("Knight")) {
             unit.setProvoke(true);
             unit.setZeal(true);
         } else if (cardName.contains("Guardian")) {
@@ -265,6 +269,41 @@ public class AIController {
             unit.setFlying(true);
         } else if (cardName.contains("Tiger")) {
             unit.setRush(true);
+        }
+    }
+
+    //need to trgger OpeningGambit for AI summons (forgot this oops
+    private static void triggerAIOpeningGambit(ActorRef out, GameState gameState, Unit summoned, String cardName){
+        if(cardName == null)
+            return;
+
+        if(cardName.contains("Silverguard Squire")){
+            Unit avatar = gameState.aiAvatar;
+            if(avatar == null)
+                return;
+
+            int avatarX = avatar.getPosition().getTilex();
+            int avatarY = avatar.getPosition().getTiley();
+
+            //check any adjacent allied units (in front or behind)
+            int[] candidateX = {avatarX - 1, avatarX + 1};
+
+            for(int c : candidateX){
+                if(!gameState.isInBounds(c, avatarY))
+                    continue;
+                Unit adjacent = gameState.getUnitAt(c, avatarY);
+                if(adjacent != null && adjacent.getOwner() == 2 && adjacent != summoned){
+                    //increase everything by 1
+                    adjacent.setAttack(adjacent.getAttack() +1);
+                    adjacent.setAttackPower(adjacent.getAttackPower() +1);
+                    adjacent.setMaxHealth(adjacent.getMaxHealth()+1);
+                    adjacent.setHealth(adjacent.getHealth() +1);
+                    BasicCommands.setUnitAttack(out, adjacent, adjacent.getAttack());
+                    BasicCommands.setUnitHealth(out, adjacent, adjacent.getHealth());
+                    System.out.println("AI Silverguard Squire Opening Gambit buffed unit " + adjacent.getId());
+                    break;
+                }
+            }
         }
     }
 

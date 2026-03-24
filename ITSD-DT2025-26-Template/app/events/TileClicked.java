@@ -218,6 +218,7 @@ public class TileClicked implements EventProcessor {
             return;
         switch(cardName){
             case "Swamp Entangler":
+                unit.setProvoke(true);//this was missing
             case "Silverguard Knight":
                 unit.setProvoke(true);
                 unit.setZeal(true);
