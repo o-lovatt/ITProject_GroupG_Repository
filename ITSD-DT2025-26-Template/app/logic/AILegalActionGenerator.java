@@ -80,7 +80,6 @@ public class AILegalActionGenerator {
             }
         }
 
-        // TODO: 遍历 AI 的手牌，如果法力值 (Mana) 足够，就为每个空地生成一个 AIPlayCardAction
 
         return cardPlays;
     }
