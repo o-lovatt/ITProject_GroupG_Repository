@@ -17,16 +17,15 @@ public class HumanCardLogic {
 
     private static final Random RNG = new Random();
 
-    // 记录场上单位对应的人类卡名，供 Deathwatch / Opening Gambit 判断
+    // Tracks the card names of units on the board for Deathwatch and Opening Gambit triggers.
     private static final Map<Integer, String> UNIT_CARD_NAMES = new HashMap<>();
 
-    // Human avatar 的 Horn robustness
+    // Human avatar Horn robustness
     private static int humanHornRobustness = 0;
 
     private HumanCardLogic() {
     }
 
-    // ========= 对外入口 =========
 
     public static boolean handleCardClicked(ActorRef out, GameState gameState, int handPosition, Card clickedCard) {
         System.out.println("DEBUG handleCardClicked: card=" + clickedCard.getCardname()
@@ -39,7 +38,7 @@ public class HumanCardLogic {
 
         clearHighlights(out, gameState);
 
-        // 无目标法术：直接施放
+        // no, direct cast
         if (isImmediateSpell(clickedCard.getCardname())) {
             if (!hasEnoughMana(out, gameState, clickedCard)) {
                 gameState.selectedCardPosition = -1;
@@ -62,13 +61,13 @@ public class HumanCardLogic {
             }
         }
 
-        // 有目标法术：高亮目标
+        // yes, highlight
         if ("Dark Terminus".equals(clickedCard.getCardname())) {
             highlightEnemyCreatures(out, gameState);
             return true;
         }
 
-        // Creature：高亮召唤格
+        // Creature：highlight
         highlightSummonTiles(out, gameState);
         return true;
     }
@@ -176,7 +175,7 @@ public class HumanCardLogic {
     public static void handleAvatarDamaged(ActorRef out, GameState gameState, Unit damagedUnit) {
         if (damagedUnit == null) return;
 
-        // 目前只做 Human 的 Horn
+        // Human's Horn
         if (damagedUnit.getId() == 1 && humanHornRobustness > 0) {
             humanHornRobustness--;
             if (humanHornRobustness <= 0) {
@@ -189,7 +188,7 @@ public class HumanCardLogic {
     public static void handleAfterAttackDamage(ActorRef out, GameState gameState, Unit attacker, Unit target) {
         if (attacker == null || target == null) return;
 
-        // Horn: avatar 对敌方单位造成伤害后，随机相邻召唤一个 Wraithling
+        // Horn: avatar get damage, create a Wraithling
         if (attacker.getId() == 1 && attacker.getOwner() == 1 && target.getOwner() == 2 && humanHornRobustness > 0) {
             summonRandomAdjacentWraithling(out, gameState, attacker, 1);
         }
@@ -258,7 +257,7 @@ public class HumanCardLogic {
 
     private static void triggerOpeningGambit(ActorRef out, GameState gameState, Unit unit, String cardName) {
         if ("Gloom Chaser".equals(cardName)) {
-            int x = unit.getPosition().getTilex() - 1; // human 在左边，身后是左
+            int x = unit.getPosition().getTilex() - 1; // human left
             int y = unit.getPosition().getTiley();
             if (gameState.isInBounds(x, y) && !gameState.hasUnitAt(x, y)) {
                 summonWraithlingAt(out, gameState, x, y, 1);
