@@ -41,8 +41,9 @@ public class CardPlayValidator {
 
         switch(name){
             case "True Strike":
+                return target.getOwner() == 2;//true strike can target any enemy incluing avatar
             case "Beam Shock":
-                return target.getOwner() == 2;
+                return target.getOwner() == 2 && target.getId() != 2;//beam shock targets non avatar enemies only
             case  "Sundrop Elixir":
                 return true;
             default:

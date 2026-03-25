@@ -68,8 +68,11 @@ public class TurnManager {
     public void endTurn() {
         drainMana(gameState);
         switchActivePlayer();
-        currentTurn++;
+        //currentTurn++; dont incrememnt here, this was causing a mana bug
         addMana();
+    }
+    public void incrementTurn(){
+        currentTurn++;
     }
 
     /**

@@ -91,7 +91,7 @@ public class AIController {
                             boolean spellCast = false;
                             String spellName = card.getCardname();
 
-                            if (spellName.contains("True Strike")) {
+                            if (spellName.contains("True Strike") || spellName.contains("Truestrike")) {
                                 //deal 2 damage to the human avatar
                                 Unit target = gameState.humanAvatar;
                                 if (target != null) {
@@ -198,6 +198,8 @@ public class AIController {
 
                 System.out.println("AI over the round");
                 Thread.sleep(1000);
+
+                gameState.getTurnManager().incrementTurn();//both players should now get correct mana based on turn number
 
                 gameState.getTurnManager().switchActivePlayer();
                 gameState.getTurnManager().addMana();

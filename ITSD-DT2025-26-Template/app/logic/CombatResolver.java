@@ -23,6 +23,11 @@ public class CombatResolver {
         if (target.getId() == 1) {
             logic.HumanCardLogic.handleAvatarDamaged(out, gameState, target);
         }
+        //trigger zeal for any ai with zeal when ai avatar takes damage
+        if(target.getId() == 2 && !target.isDead()){
+            triggerZeal(out, gameState, 2);
+        }
+
         if (target.isDead()) {
             logic.HumanCardLogic.handleUnitDeath(out, gameState, target);
         }
@@ -42,6 +47,10 @@ public class CombatResolver {
                 if (attacker.getId() == 1) {
                     logic.HumanCardLogic.handleAvatarDamaged(out, gameState, attacker);
                 }
+                //added - trigger zeal on counter-attack to AI
+                if(attacker.getId() == 2 && !attacker.isDead()){
+                    triggerZeal(out, gameState, 2);
+                }
                 if (attacker.isDead()) {
                     logic.HumanCardLogic.handleUnitDeath(out, gameState, attacker);
                 }
@@ -50,6 +59,21 @@ public class CombatResolver {
 
         BasicCommands.playUnitAnimation(out, attacker, UnitAnimationType.idle);
         BasicCommands.playUnitAnimation(out, target, UnitAnimationType.idle);
+    }
+
+    //every friendly unit that has zeal gains +2 attack permanently
+    private void triggerZeal(ActorRef out, GameState gameState, int avatarOwner){
+        for(int x = 1; x <= 9; x++){
+            for(int y = 1; y <= 5; y++){
+                Unit u = gameState.getUnitAt(x, y);
+                if(u !=null && u.getOwner() == avatarOwner && u.hasZeal()){
+                    u.setAttack(u.getAttack() +2);
+                    u.setAttackPower(u.getAttackPower() +2);
+                    BasicCommands.setUnitAttack(out, u, u.getAttack());
+                    System.out.println("Unit " + u.getId() + "gained +2 attack " + u.getAttack());
+                }
+            }
+        }
     }
 
     private void applyDamage(ActorRef out, GameState gameState, Unit unit, int damage) {

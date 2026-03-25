@@ -3,6 +3,7 @@ package logic;
 import akka.actor.ActorRef;
 import commands.BasicCommands;
 import structures.GameState;
+import structures.PlayerSide;
 import structures.basic.Card;
 import structures.basic.Tile;
 import structures.basic.Unit;
@@ -152,6 +153,18 @@ public class HumanCardLogic {
                     if (enemyAvatar != null) {
                         enemyAvatar.takeDamage(1);
                         updateAvatarUi(out, gameState, enemyAvatar);
+                    }
+                    //if shadowdancer kills the enemy avatar, end the game
+                    if(enemyAvatar.isDead()){
+                        BasicCommands.deleteUnit(out, enemyAvatar);
+                        gameState.removeUnit(enemyAvatar.getPosition().getTilex(), enemyAvatar.getPosition().getTiley());
+                        if(enemyAvatar.getId() == 2) {
+                            BasicCommands.addPlayer1Notification(out, "GAME OVER - YOU WIN", 100);
+                            gameState.setGameOver(PlayerSide.HUMAN_LEFT);
+                        } else if (enemyAvatar.getId()== 1) {
+                            BasicCommands.addPlayer1Notification(out, "GAME OVER - YOU LOOSE", 100);
+                            gameState.setGameOver(PlayerSide.AI_RIGHT);
+                        }
                     }
                     unit.heal(1);
                     BasicCommands.setUnitHealth(out, unit, unit.getHealth());

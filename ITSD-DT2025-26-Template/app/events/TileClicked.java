@@ -196,7 +196,7 @@ public class TileClicked implements EventProcessor {
 
 	private void executeSpell(ActorRef out, GameState gameState, Card card, Unit target, Tile tile) {
 		String spellName = card.getCardname();
-		if(spellName.contains("True Strike")) {
+		if(spellName.contains("True Strike") || spellName.contains("Truestrike")) {
             logic.SpellService.castTrueStrike(out, gameState, target);
         }else if(spellName.contains("Beam Shock")){
             logic.SpellService.castBeamShock(out, gameState, target);

@@ -45,10 +45,15 @@ public class CardClicked implements EventProcessor {
             for (int x = 1; x <= 9; x++) {
                 for (int y = 1; y <= 5; y++) {
                     Unit target = gameState.getUnitAt(x, y);
-                    if (target != null) {
-                        if ((spellName.contains("True Strike") || spellName.contains("Beam Shock")) && target.getOwner() == 2) {
-                            gameState.addHighlight(x, y);
+                    if (target != null && target.getOwner() == 2) {
+                        if (spellName.contains("True Strike") || spellName.contains("Truestrike")){//true strike can hit any enemy
+                            gameState.addHighlight(x, y);//true strike wasn't triggering correctly, added "Truestrike" check too
                             BasicCommands.drawTile(out, gameState.getTile(x, y), 2);
+                        }else if (spellName.contains("Beam Shock")){
+                            if(target.getId()!= 2){ //beam shock cannot hit the avatar
+                                gameState.addHighlight(x, y);
+                                BasicCommands.drawTile(out, gameState.getTile(x, y), 2);
+                            }
                         }
                     }
                 }

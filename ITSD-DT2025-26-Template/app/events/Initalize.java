@@ -17,6 +17,8 @@ public class Initalize implements EventProcessor {
     @Override
     public void processEvent(ActorRef out, GameState gameState, JsonNode message) {
 
+        logic.HumanCardLogic.resetState();//always reset card state unconditionally
+
         if (gameState.gameInitalised) {
             logic.HumanCardLogic.resetState();
             return;

@@ -7,11 +7,15 @@ public class AIActionScorer {
 
     public static int scoreAttack(AIAttackAction action) {
         int score = 0;
-        if (action.target != null && action.target.getId() == 1) {
-            score += 1000;
-        }
-        else if (action.target != null && action.target.hasProvoke()) {
+        if(action.target == null)
+            return score;
+
+        //attacking provoke units is always highest priority
+        if (action.target.hasProvoke()) {
             score += 2000;
+        }
+        else if (action.target.getId() == 1) {
+            score += 1500;//avatar is second priority
         }
         else {
             score += 500;
