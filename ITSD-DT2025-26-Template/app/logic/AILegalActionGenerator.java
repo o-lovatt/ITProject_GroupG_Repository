@@ -8,71 +8,61 @@ import structures.basic.Unit;
 
 public class AILegalActionGenerator {
 
-    public static List<AIMoveAction> getLegalMoves(GameState gameState, Unit unit) {
-        List<AIMoveAction> validMoves = new ArrayList<>();
-        if (unit == null || unit.hasMoved()) return validMoves;
+    public static List<AIMoveAction> getLegalMoves(GameState gameState, Unit aiUnit) {
+        List<AIMoveAction> moves = new ArrayList<>();
 
-        int ux = unit.getPosition().getTilex();
-        int uy = unit.getPosition().getTiley();
-
-        for (int x = ux - 1; x <= ux + 1; x++) {
-            for (int y = uy - 1; y <= uy + 1; y++) {
-                if (gameState.isInBounds(x, y)) {
-                    Unit neighbor = gameState.getUnitAt(x, y);
-                    if (neighbor != null && neighbor.getOwner() != unit.getOwner() && neighbor.isProvoke) {
-                        return validMoves;
-                    }
-                }
-            }
+        if (aiUnit.hasMoved()) {
+            return moves;
         }
+        if (aiUnit.isStunned()) //added to check if stunned
+            return moves;
 
-        List<Tile> reachable = logic.MovementLogic.getReachableTiles(gameState, unit);
+        List<Tile> reachable = MovementLogic.getReachableTiles(gameState, aiUnit);
         for (Tile t : reachable) {
-            validMoves.add(new AIMoveAction(unit, t));
+            moves.add(new AIMoveAction(aiUnit, t));
         }
 
-        return validMoves;
+        return moves;
     }
 
-    public static List<AIAttackAction> getLegalAttacks(GameState gameState, Unit unit) {
-        List<AIAttackAction> validAttacks = new ArrayList<>();
-        if (unit == null || unit.hasAttacked()) return validAttacks;
+    public static List<AIAttackAction> getLegalAttacks(GameState gameState, Unit aiUnit) {
+        List<AIAttackAction> attacks = new ArrayList<>();
+        if (aiUnit.hasAttacked()) {
+            return attacks;
+        }
+        if (aiUnit.isStunned()) //added to check if stunned
+            return attacks;
 
-        int ux = unit.getPosition().getTilex();
-        int uy = unit.getPosition().getTiley();
+        int ux = aiUnit.getPosition().getTilex();
+        int uy = aiUnit.getPosition().getTiley();
 
-        List<Unit> adjacentProvokers = new ArrayList<>();
+        boolean amIProvoked = MovementLogic.isProvoked(gameState, aiUnit);
+
         for (int x = ux - 1; x <= ux + 1; x++) {
             for (int y = uy - 1; y <= uy + 1; y++) {
+                if(x == ux && y == uy)
+                    continue; //minor fix, skip sself
                 if (gameState.isInBounds(x, y)) {
                     Unit target = gameState.getUnitAt(x, y);
-                    if (target != null && target.getOwner() != unit.getOwner() && target.isProvoke) {
-                        adjacentProvokers.add(target);
+
+                    //minor fix, search for all human units not just the avatar
+                    if (target != null && target.getOwner() == 1) {
+
+                        if (amIProvoked) {
+                            if (target.hasProvoke()) {
+                                attacks.add(new AIAttackAction(aiUnit, target));
+                            }
+                        } else {
+                            attacks.add(new AIAttackAction(aiUnit, target));
+                        }
                     }
                 }
             }
         }
-
-        if (!adjacentProvokers.isEmpty()) {
-            for (Unit provoker : adjacentProvokers) {
-                validAttacks.add(new AIAttackAction(unit, provoker));
-            }
-            return validAttacks;
-        }
-
-        for (int x = ux - 1; x <= ux + 1; x++) {
-            for (int y = uy - 1; y <= uy + 1; y++) {
-                if (gameState.isInBounds(x, y)) {
-                    Unit target = gameState.getUnitAt(x, y);
-                    if (target != null && target.getOwner() != unit.getOwner()) {
-                        validAttacks.add(new AIAttackAction(unit, target));
-                    }
-                }
-            }
-        }
-        return validAttacks;
+        return attacks;
     }
-
+//returns legal card play for the AI
+    /// TODO check ai hand and filer by mana cost
     public static List<AIPlayCardAction> getLegalCardPlays(GameState gameState) {
         List<AIPlayCardAction> cardPlays = new ArrayList<>();
 

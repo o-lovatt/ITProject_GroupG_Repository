@@ -211,8 +211,8 @@ public class BasicObjectBuilders {
 		int gridTopLefty = 280;
 
 		Tile tile = Tile.constructTile(StaticConfFiles.tileConf);
-		tile.setXpos((tile.getWidth()*x)+(gridmargin*x)+gridTopLeftx);
-		tile.setYpos((tile.getHeight()*y)+(gridmargin*y)+gridTopLefty);
+		tile.setXpos((tile.getWidth()*(x-1))+(gridmargin*(x-1))+gridTopLeftx); //board was positioned wrong, my fault cause i set x&y = 1 instead of 0 in initialize
+		tile.setYpos((tile.getHeight()*(y-1))+(gridmargin*(y-1))+gridTopLefty); //this was an easier fix to not mess with anything
 		tile.setTilex(x);
 		tile.setTiley(y);
 

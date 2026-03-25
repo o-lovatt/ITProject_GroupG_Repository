@@ -55,8 +55,6 @@ public class Unit {
     public boolean hasZeal() { return hasZeal; }
     public void setZeal(boolean zeal) { hasZeal = zeal; }
 
-    public boolean isProvoke = false;
-
 	public Unit() {}
 
     public Unit(int id, UnitAnimationSet animations, ImageCorrection correction) {
@@ -168,11 +166,21 @@ public class Unit {
         this.isStunned = isStunned;
     }
 
+
+    public void resetMoveandAttack(){
+        this.hasMoved = false;
+        this.hasAttacked = false;
+    }//added this to call at the end of opponents turn
+
+    public void clearStun(){
+        this.isStunned = false;
+    }//added to call after resetMoveandAttack to clear stun
+
     public void resetTurnState() {
         this.hasMoved = false;
         this.hasAttacked = false;
         this.isStunned = false;
-    }
+    }//full rest including stun
 
 	public int getId() {
 		return id;

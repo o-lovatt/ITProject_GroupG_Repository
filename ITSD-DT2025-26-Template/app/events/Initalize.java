@@ -17,9 +17,13 @@ public class Initalize implements EventProcessor {
     @Override
     public void processEvent(ActorRef out, GameState gameState, JsonNode message) {
 
+        logic.HumanCardLogic.resetState();//always reset card state unconditionally
+
         if (gameState.gameInitalised) {
+            logic.HumanCardLogic.resetState();
             return;
         }
+
 
         gameState.gameInitalised = true;
         gameState.something = true;
@@ -35,13 +39,13 @@ public class Initalize implements EventProcessor {
         Unit humanAvatar = BasicObjectBuilders.loadUnit(StaticConfFiles.humanAvatar, 1, Unit.class);
         humanAvatar.setMaxHealth(20);
         humanAvatar.heal(20);
-        humanAvatar.setAttack(2);
+        humanAvatar.setAttack(2);//this was missing
         humanAvatar.setAttackPower(2);
 
         Unit aiAvatar = BasicObjectBuilders.loadUnit(StaticConfFiles.aiAvatar, 2, Unit.class);
         aiAvatar.setMaxHealth(20);
         aiAvatar.heal(20);
-        aiAvatar.setAttack(2);
+        aiAvatar.setAttack(2);//this was missing
         aiAvatar.setAttackPower(2);
 
         gameState.humanAvatar = humanAvatar;
@@ -69,7 +73,7 @@ public class Initalize implements EventProcessor {
         gameState.player1.setHealth(20);
         gameState.player2.setHealth(20);
 
-        gameState.player1.deck = logic.CardFactory.createLyonarDeck();
+        gameState.player1.deck = logic.CardFactory.buildHumanDeck();
         gameState.player2.deck = logic.CardFactory.createLyonarDeck();
 
         System.out.println("player card totally " + gameState.player1.deck.size() + " cards! ");
@@ -86,7 +90,7 @@ public class Initalize implements EventProcessor {
         BasicCommands.setPlayer1Mana(out, gameState.player1);
         BasicCommands.setPlayer2Mana(out, gameState.player2);
 
-        BasicCommands.addPlayer1Notification(out, "Game initialised", 2);
+        BasicCommands.addPlayer1Notification(out, "GAME START", 2);
 
         new Thread(() -> {
             try {
@@ -101,3 +105,4 @@ public class Initalize implements EventProcessor {
         }).start();
     }
 }
+

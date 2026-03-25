@@ -35,7 +35,9 @@ public class Card {
 		this.isCreature = isCreature;
 		this.unitConfig = unitConfig;
 	}
-	
+
+
+    //card setters and getters
 	public int getId() {
 		return id;
 	}

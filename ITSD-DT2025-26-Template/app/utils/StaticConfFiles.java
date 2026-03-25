@@ -34,4 +34,15 @@ public class StaticConfFiles {
 	public final static String c_young_flamewing = "conf/gameconfs/cards/2_6_c_u_young_flamewing.json";
 	public final static String c_silverguard_squire = "conf/gameconfs/cards/2_7_c_u_silverguard_squire.json";
 	public final static String c_ironcliffe_guardian = "conf/gameconfs/cards/2_8_c_u_ironcliff_guardian.json";
+
+	public final static String c_bad_omen = "conf/gameconfs/cards/1_1_c_u_bad_omen.json";
+	public final static String c_horn_of_the_forsaken = "conf/gameconfs/cards/1_2_c_s_hornoftheforsaken.json";
+	public final static String c_gloom_chaser = "conf/gameconfs/cards/1_3_c_u_gloom_chaser.json";
+	public final static String c_shadow_watcher = "conf/gameconfs/cards/1_4_c_u_shadow_watcher.json";
+	public final static String c_wraithling_swarm = "conf/gameconfs/cards/1_5_c_s_wraithling_swarm.json";
+	public final static String c_nightsorrow_assassin = "conf/gameconfs/cards/1_6_c_u_nightsorrow_assassin.json";
+	public final static String c_rock_pulveriser = "conf/gameconfs/cards/1_7_c_u_rock_pulveriser.json";
+	public final static String c_dark_terminus = "conf/gameconfs/cards/1_8_c_s_dark_terminus.json";
+	public final static String c_bloodmoon_priestess = "conf/gameconfs/cards/1_9_c_u_bloodmoon_priestess.json";
+	public final static String c_shadowdancer = "conf/gameconfs/cards/1_a1_c_u_shadowdancer.json";
 }
