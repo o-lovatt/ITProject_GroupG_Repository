@@ -152,21 +152,23 @@ public class HumanCardLogic {
                     if (enemyAvatar != null) {
                         enemyAvatar.takeDamage(1);
                         updateAvatarUi(out, gameState, enemyAvatar);
-                    }
-                    //if shadowdancer kills the enemy avatar, end the game
-                    if(enemyAvatar.isDead()){
-                        BasicCommands.deleteUnit(out, enemyAvatar);
-                        gameState.removeUnit(enemyAvatar.getPosition().getTilex(), enemyAvatar.getPosition().getTiley());
-                        if(enemyAvatar.getId() == 2) {
-                            BasicCommands.addPlayer1Notification(out, "GAME OVER - YOU WIN", 100);
-                            gameState.setGameOver(PlayerSide.HUMAN_LEFT);
-                        } else if (enemyAvatar.getId()== 1) {
-                            BasicCommands.addPlayer1Notification(out, "GAME OVER - YOU LOOSE", 100);
-                            gameState.setGameOver(PlayerSide.AI_RIGHT);
+
+                        //if shadowdancer kills the enemy avatar, end the game
+                        if (enemyAvatar.isDead()) { //does this need a null point exception?
+                            BasicCommands.deleteUnit(out, enemyAvatar);
+                            gameState.removeUnit(enemyAvatar.getPosition().getTilex(), enemyAvatar.getPosition().getTiley());
+                            if (enemyAvatar.getId() == 2) {
+                                BasicCommands.addPlayer1Notification(out, "GAME OVER - YOU WIN", 100);
+                                gameState.setGameOver(PlayerSide.HUMAN_LEFT);
+                            } else if (enemyAvatar.getId() == 1) {
+                                BasicCommands.addPlayer1Notification(out, "GAME OVER - YOU LOOSE", 100);
+                                gameState.setGameOver(PlayerSide.AI_RIGHT);
+                            }
                         }
+                        unit.heal(1);
+                        BasicCommands.setUnitHealth(out, unit, unit.getHealth());
+
                     }
-                    unit.heal(1);
-                    BasicCommands.setUnitHealth(out, unit, unit.getHealth());
                     break;
             }
         }
@@ -177,6 +179,8 @@ public class HumanCardLogic {
 
         // Human's Horn
         if (damagedUnit.getId() == 1 && humanHornRobustness > 0) {
+            summonRandomAdjacentWraithling(out, gameState, damagedUnit, 1);
+
             humanHornRobustness--;
             if (humanHornRobustness <= 0) {
                 humanHornRobustness = 0;
@@ -186,12 +190,11 @@ public class HumanCardLogic {
     }
 
     public static void handleAfterAttackDamage(ActorRef out, GameState gameState, Unit attacker, Unit target) {
-        if (attacker == null || target == null) return;
+        //if (attacker == null || target == null) return;
 
         // Horn: avatar get damage, create a Wraithling
-        if (attacker.getId() == 1 && attacker.getOwner() == 1 && target.getOwner() == 2 && humanHornRobustness > 0) {
-            summonRandomAdjacentWraithling(out, gameState, attacker, 1);
-        }
+        //if (attacker.getId() == 1 && attacker.getOwner() == 1 && target.getOwner() == 2 && humanHornRobustness > 0) {
+            //HORN OF FORSAKEN NOW HANDLED IN handleAvatarDamage
     }
 
     // ========= Human card effects =========

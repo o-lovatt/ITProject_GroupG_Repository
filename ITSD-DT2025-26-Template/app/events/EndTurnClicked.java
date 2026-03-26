@@ -13,6 +13,7 @@ public class EndTurnClicked implements EventProcessor {
 	@Override
 	public void processEvent(ActorRef out, GameState gameState, JsonNode message) {
 		if (!gameState.gameInitalised) return;
+        if(gameState.isGameOver()) return;// turns kept incrementing after game over, fixed
 
 		if (gameState.getTurnManager().getActivePlayer() != PlayerSide.HUMAN_LEFT || gameState.unitMoving) {
 			return;

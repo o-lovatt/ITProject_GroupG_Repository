@@ -81,6 +81,7 @@ public class AIController {
                             if (!summoned.hasRush()) {
                                 summoned.setHasAttacked(true);
                             }
+                            triggerAIOpeningGambit(out, gameState, summoned, card.getCardname());//forgot to call opening gambit
 
                             anyActionTaken = true;
                             Thread.sleep(1500);

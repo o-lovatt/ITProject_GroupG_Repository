@@ -92,6 +92,7 @@ public class Unit {
         //initial combat stats
         this.health = health;
         this.maxHealth = health;
+        this.attack = attackPower;
         this.attackPower = attackPower;
         this.hasMoved = false;
         this.hasAttacked = false;

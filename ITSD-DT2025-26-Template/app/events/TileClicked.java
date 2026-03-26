@@ -174,11 +174,16 @@ public class TileClicked implements EventProcessor {
 			if (!clickedUnit.hasAttacked()) {
 				int ux = clickedUnit.getPosition().getTilex();
 				int uy = clickedUnit.getPosition().getTiley();
+
+                boolean isProvoked = logic.MovementLogic.isProvoked(gameState, clickedUnit);
+
 				for (int x = ux - 1; x <= ux + 1; x++) {
 					for (int y = uy - 1; y <= uy + 1; y++) {
 						if (gameState.isInBounds(x, y)) {
 							Unit target = gameState.getUnitAt(x, y);
 							if (target != null && target.getOwner() != clickedUnit.getOwner()) {
+                                if(isProvoked && !target.hasProvoke())//this was missing, if provoked, only highlight provoking units
+                                    continue;
 								gameState.addHighlight(x, y);
 								BasicCommands.drawTile(out, gameState.getTile(x, y), 2);
 							}
@@ -219,6 +224,7 @@ public class TileClicked implements EventProcessor {
         switch(cardName){
             case "Swamp Entangler":
                 unit.setProvoke(true);//this was missing
+                break;
             case "Silverguard Knight":
                 unit.setProvoke(true);
                 unit.setZeal(true);
